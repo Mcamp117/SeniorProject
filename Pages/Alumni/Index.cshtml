@@ -1,0 +1,77 @@
+@page
+@model EagleConnect.Pages.Alumni.IndexModel
+@{
+    ViewData["Title"] = "Alumni Directory";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-primary">Alumni Directory</h1>
+            <p class="lead">Connect with successful USI alumni who are ready to mentor and guide current students.</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.Alumni.Count</h3>
+                    <p class="mb-0">Active Alumni</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.ActiveMentorships.Count</h3>
+                    <p class="mb-0">Active Mentorships</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.Alumni.SelectMany(a => a.Skills).Distinct().Count()</h3>
+                    <p class="mb-0">Skill Areas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var alum in Model.Alumni)
+        {
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img src="@alum.ProfileImage" alt="@alum.FirstName @alum.LastName" class="img-fluid rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            </div>
+                            <div class="col-md-9">
+                                <h5 class="card-title">@alum.FirstName @alum.LastName</h5>
+                                <p class="card-text">
+                                    <strong>@alum.JobTitle</strong> at @alum.Company<br>
+                                    <small class="text-muted">@alum.Major '@alum.GraduationYear</small>
+                                </p>
+                                <p class="card-text">@alum.Bio</p>
+                                <div class="mb-2">
+                                    @foreach (var skill in alum.Skills.Take(3))
+                                    {
+                                        <span class="badge bg-secondary me-1">@skill</span>
+                                    }
+                                    @if (alum.Skills.Count > 3)
+                                    {
+                                        <span class="badge bg-light text-dark">+@(alum.Skills.Count - 3) more</span>
+                                    }
+                                </div>
+                                <a href="mailto:@alum.Email" class="btn btn-primary btn-sm">Contact</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

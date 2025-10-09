@@ -1,0 +1,113 @@
+@page
+@model EagleConnect.Pages.Alumni.MentorshipModel
+@{
+    ViewData["Title"] = "Mentorship Program";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-primary">Alumni Mentorship Program</h1>
+            <p class="lead">Connect with experienced alumni who can guide you through your academic and career journey.</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Active Mentorships</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Mentorships.Any())
+                    {
+                        @foreach (var mentorship in Model.Mentorships.Where(m => m.Status == "Active"))
+                        {
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Mentor: @mentorship.Mentor?.FirstName @mentorship.Mentor?.LastName</h6>
+                                        <small class="text-muted">@mentorship.Mentor?.JobTitle at @mentorship.Mentor?.Company</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Mentee: @mentorship.Mentee?.FirstName @mentorship.Mentee?.LastName</h6>
+                                        <small class="text-muted">@mentorship.Mentee?.Major - @mentorship.Mentee?.Year</small>
+                                    </div>
+                                </div>
+                                <p class="mt-2 mb-0"><small>@mentorship.Notes</small></p>
+                                <span class="badge bg-success">@mentorship.Status</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">No active mentorships found.</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Available Mentors</h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var mentor in Model.AvailableMentors.Take(5))
+                    {
+                        <div class="border-bottom pb-2 mb-2">
+                            <h6>@mentor.FirstName @mentor.LastName</h6>
+                            <small class="text-muted">@mentor.JobTitle at @mentor.Company</small><br>
+                            <small>@mentor.Major '@mentor.GraduationYear</small>
+                        </div>
+                    }
+                    @if (Model.AvailableMentors.Count > 5)
+                    {
+                        <p class="text-muted">And @(Model.AvailableMentors.Count - 5) more mentors available...</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">How Mentorship Works</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-search fa-2x text-primary"></i>
+                            </div>
+                            <h6>1. Find a Mentor</h6>
+                            <p class="small">Browse alumni profiles and find someone whose career path interests you.</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-envelope fa-2x text-success"></i>
+                            </div>
+                            <h6>2. Reach Out</h6>
+                            <p class="small">Send an email introducing yourself and explaining your goals.</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-handshake fa-2x text-warning"></i>
+                            </div>
+                            <h6>3. Establish Connection</h6>
+                            <p class="small">Set up regular meetings and define your mentorship goals.</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-chart-line fa-2x text-info"></i>
+                            </div>
+                            <h6>4. Grow Together</h6>
+                            <p class="small">Learn, network, and advance your career with guidance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

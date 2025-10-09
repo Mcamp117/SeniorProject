@@ -1,0 +1,115 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Eagle Connect - Home";
+}
+
+<div class="container">
+    <!-- Connection Posts Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h4 fw-bold">Active Connection Posts</h2>
+                <span class="badge bg-primary">@Model.ActiveConnectionPosts.Count posts</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var post in Model.ActiveConnectionPosts)
+        {
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100 connection-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-1">@post.Title</h5>
+                            <div>
+                                <span class="badge bg-primary">@post.Type</span>
+                                <span class="badge bg-success">@post.Seeking</span>
+                            </div>
+                        </div>
+                        <p class="card-text text-muted mb-2">
+                            <i class="fas fa-map-marker-alt me-1"></i>@post.Location
+                        </p>
+                        <p class="card-text">@post.Description</p>
+                        
+                        @if (post.Skills.Any())
+                        {
+                            <div class="mb-2">
+                                <small class="text-muted"><strong>Skills:</strong></small>
+                                @foreach (var skill in post.Skills.Take(3))
+                                {
+                                    <span class="badge bg-secondary me-1">@skill</span>
+                                }
+                                @if (post.Skills.Count > 3)
+                                {
+                                    <span class="badge bg-light text-dark">+@(post.Skills.Count - 3) more</span>
+                                }
+                            </div>
+                        }
+                        
+                        @if (post.Requirements.Any())
+                        {
+                            <div class="mb-3">
+                                <small class="text-muted"><strong>Requirements:</strong></small>
+                                <ul class="small mb-0 mt-1">
+                                    @foreach (var req in post.Requirements.Take(2))
+                                    {
+                                        <li>@req</li>
+                                    }
+                                    @if (post.Requirements.Count > 2)
+                                    {
+                                        <li><em>+@(post.Requirements.Count - 2) more requirements</em></li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>Posted @post.PostedDate.ToString("MMM dd")
+                                @if (post.Deadline.HasValue)
+                                {
+                                    <span class="ms-3"><i class="fas fa-calendar me-1"></i>Deadline @post.Deadline.Value.ToString("MMM dd")</span>
+                                }
+                            </small>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <a href="mailto:@post.ContactInfo" class="btn btn-primary btn-sm">Connect</a>
+                            <button class="btn btn-outline-secondary btn-sm" disabled>Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <h4 class="text-primary">@Model.TotalUsers</h4>
+                            <small class="text-muted">Total Users</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-success">@Model.TotalAlumni</h4>
+                            <small class="text-muted">Alumni</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-info">@Model.TotalStudents</h4>
+                            <small class="text-muted">Students</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-warning">@Model.ActiveRelationships</h4>
+                            <small class="text-muted">Active Connections</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

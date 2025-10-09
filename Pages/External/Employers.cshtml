@@ -1,0 +1,139 @@
+@page
+@model EagleConnect.Pages.External.EmployersModel
+@{
+    ViewData["Title"] = "Employers & Career Opportunities";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-primary">Employers & Career Opportunities</h1>
+            <p class="lead">Connect with potential employers and explore career opportunities with companies that value USI talent.</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.Companies.Count</h3>
+                    <p class="mb-0">Partner Companies</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.Employers.Count</h3>
+                    <p class="mb-0">Recruiters & Contacts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h3>5+</h3>
+                    <p class="mb-0">Open Positions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3>Partner Companies</h3>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        @foreach (var company in Model.Companies)
+        {
+            var companyEmployers = Model.Employers.Where(e => e.Company == company).ToList();
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">@company</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">@companyEmployers.Count contact(s) available</p>
+                        <ul class="list-unstyled">
+                            @foreach (var employer in companyEmployers)
+                            {
+                                <li class="mb-2">
+                                    <strong>@employer.FirstName @employer.LastName</strong><br>
+                                    <small class="text-muted">@employer.JobTitle</small><br>
+                                    <a href="mailto:@employer.Email" class="btn btn-outline-primary btn-sm mt-1">Contact</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h3>Available Opportunities</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="border p-3 rounded">
+                                <h6>Software Development Internship</h6>
+                                <p class="small text-muted">TechCorp - Summer 2025</p>
+                                <p class="small">Join our development team and work on cutting-edge projects. Perfect for Computer Science students.</p>
+                                <span class="badge bg-primary">Internship</span>
+                                <span class="badge bg-secondary">Remote</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="border p-3 rounded">
+                                <h6>Marketing Assistant</h6>
+                                <p class="small text-muted">InnovateStart - Part-time</p>
+                                <p class="small">Help with digital marketing campaigns and social media management. Great for Business students.</p>
+                                <span class="badge bg-success">Part-time</span>
+                                <span class="badge bg-info">Marketing</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="border p-3 rounded">
+                                <h6>Research Assistant</h6>
+                                <p class="small text-muted">Various Companies - Flexible</p>
+                                <p class="small">Support research projects in various fields. Open to all majors with research interests.</p>
+                                <span class="badge bg-warning">Research</span>
+                                <span class="badge bg-secondary">Flexible</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="border p-3 rounded">
+                                <h6>Healthcare Volunteer</h6>
+                                <p class="small text-muted">Local Hospitals - Ongoing</p>
+                                <p class="small">Gain healthcare experience and make a difference in your community. Ideal for Nursing students.</p>
+                                <span class="badge bg-info">Volunteer</span>
+                                <span class="badge bg-success">Healthcare</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5>Ready to Connect?</h5>
+                    <p>Reach out to our employer contacts to learn more about opportunities and how to apply.</p>
+                    <a asp-page="/External/Index" class="btn btn-primary">View All Contacts</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

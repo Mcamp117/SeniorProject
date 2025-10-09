@@ -1,0 +1,156 @@
+@page
+@model EagleConnect.Pages.PeopleModel
+@{
+    ViewData["Title"] = "Browse People";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-primary">Browse People</h1>
+            <p class="lead">Connect with students, alumni, faculty, and professionals in the USI community.</p>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Search</label>
+                            <input type="text" class="form-control" id="search" name="search" value="@Model.SearchTerm" placeholder="Name, company, skills...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="type" class="form-label">User Type</label>
+                            <select class="form-select" id="type" name="type">
+                                <option value="">All Types</option>
+                                <option value="Student" selected="@(Model.SelectedType == "Student")">Students</option>
+                                <option value="Alumni" selected="@(Model.SelectedType == "Alumni")">Alumni</option>
+                                <option value="Faculty" selected="@(Model.SelectedType == "Faculty")">Faculty</option>
+                                <option value="External" selected="@(Model.SelectedType == "External")">External</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="major" class="form-label">Major/Field</label>
+                            <select class="form-select" id="major" name="major">
+                                <option value="">All Majors</option>
+                                @foreach (var major in Model.AvailableMajors)
+                                {
+                                    <option value="@major" selected="@(Model.SelectedMajor == major)">@major</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="h5 mb-0">@Model.FilteredUsers.Count people found</h3>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-secondary btn-sm active">Grid View</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" disabled>List View</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- People Grid -->
+    <div class="row">
+        @foreach (var user in Model.FilteredUsers)
+        {
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 person-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <img src="@user.ProfileImage" alt="@user.FirstName @user.LastName" class="img-fluid rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-1">@user.FirstName @user.LastName</h5>
+                                <p class="card-text text-muted mb-1">
+                                    @if (user.Type == EagleConnect.Models.UserType.Student)
+                                    {
+                                        <span class="badge bg-primary">@user.Year Student</span>
+                                    }
+                                    else if (user.Type == EagleConnect.Models.UserType.Alumni)
+                                    {
+                                        <span class="badge bg-success">Alumni '@user.GraduationYear</span>
+                                    }
+                                    else if (user.Type == EagleConnect.Models.UserType.Faculty)
+                                    {
+                                        <span class="badge bg-info">Faculty</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">External</span>
+                                    }
+                                </p>
+                                @if (!string.IsNullOrEmpty(user.JobTitle) && !string.IsNullOrEmpty(user.Company))
+                                {
+                                    <p class="card-text small text-muted mb-1">
+                                        <strong>@user.JobTitle</strong> at @user.Company
+                                    </p>
+                                }
+                                @if (!string.IsNullOrEmpty(user.Major))
+                                {
+                                    <p class="card-text small text-muted">@user.Major</p>
+                                }
+                            </div>
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(user.Bio))
+                        {
+                            <p class="card-text small">@user.Bio</p>
+                        }
+                        
+                        @if (user.Skills.Any())
+                        {
+                            <div class="mb-3">
+                                @foreach (var skill in user.Skills.Take(3))
+                                {
+                                    <span class="badge bg-secondary me-1">@skill</span>
+                                }
+                                @if (user.Skills.Count > 3)
+                                {
+                                    <span class="badge bg-light text-dark">+@(user.Skills.Count - 3) more</span>
+                                }
+                            </div>
+                        }
+                        
+                        <div class="d-flex gap-2">
+                            <a href="mailto:@user.Email" class="btn btn-primary btn-sm">Contact</a>
+                            <button class="btn btn-outline-secondary btn-sm" disabled>Connect</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!Model.FilteredUsers.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No people found</h4>
+                        <p class="text-muted">Try adjusting your search criteria or filters.</p>
+                        <a asp-page="/People" class="btn btn-primary">Clear Filters</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

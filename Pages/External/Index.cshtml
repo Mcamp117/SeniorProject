@@ -1,0 +1,95 @@
+@page
+@model EagleConnect.Pages.External.IndexModel
+@{
+    ViewData["Title"] = "External Mentors";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-primary">External Mentors</h1>
+            <p class="lead">Connect with industry professionals and external mentors who can provide valuable career guidance and opportunities.</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.ExternalMentors.Count</h3>
+                    <p class="mb-0">External Mentors</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.ExternalMentorships.Count</h3>
+                    <p class="mb-0">Active Connections</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var mentor in Model.ExternalMentors)
+        {
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img src="@mentor.ProfileImage" alt="@mentor.FirstName @mentor.LastName" class="img-fluid rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            </div>
+                            <div class="col-md-9">
+                                <h5 class="card-title">@mentor.FirstName @mentor.LastName</h5>
+                                <p class="card-text">
+                                    <strong>@mentor.JobTitle</strong> at @mentor.Company<br>
+                                    <span class="badge bg-info">External Mentor</span>
+                                </p>
+                                <p class="card-text">@mentor.Bio</p>
+                                <div class="mb-2">
+                                    @foreach (var skill in mentor.Skills.Take(3))
+                                    {
+                                        <span class="badge bg-secondary me-1">@skill</span>
+                                    }
+                                    @if (mentor.Skills.Count > 3)
+                                    {
+                                        <span class="badge bg-light text-dark">+@(mentor.Skills.Count - 3) more</span>
+                                    }
+                                </div>
+                                <a href="mailto:@mentor.Email" class="btn btn-primary btn-sm">Contact Mentor</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Benefits of External Mentorship</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6><i class="fas fa-briefcase text-primary"></i> Industry Insights</h6>
+                            <p class="small">Get real-world perspective from professionals actively working in your field of interest.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6><i class="fas fa-network-wired text-success"></i> Professional Network</h6>
+                            <p class="small">Expand your professional network beyond the university community.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6><i class="fas fa-rocket text-info"></i> Career Opportunities</h6>
+                            <p class="small">Access to internships, job opportunities, and career advancement advice.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

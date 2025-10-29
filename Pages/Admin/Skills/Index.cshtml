@@ -1,0 +1,57 @@
+@page
+@model EagleConnect.Pages.Admin.Skills.IndexModel
+@{
+    ViewData["Title"] = "Skills Management";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Skills Management</h2>
+                <a asp-page="Create" class="btn btn-primary">Add New Skill</a>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var skill in Model.Skills)
+                                {
+                                    <tr>
+                                        <td>@skill.Name</td>
+                                        <td>@skill.Description</td>
+                                        <td>
+                                            <span class="badge bg-secondary">@skill.Category</span>
+                                        </td>
+                                        <td>@skill.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                        <td>
+                                            <a asp-page="Edit" asp-route-id="@skill.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                            <form method="post" asp-page-handler="Delete" asp-route-id="@skill.Id" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                        onclick="return confirm('Are you sure you want to delete this skill?')">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

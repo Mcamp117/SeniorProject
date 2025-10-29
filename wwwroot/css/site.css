@@ -86,6 +86,35 @@ body {
   color: white;
   padding: 20px 0;
   margin-top: 50px;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Ensure proper spacing for all pages */
+body {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+main {
+  min-height: calc(100vh - 200px);
+  padding-bottom: 2rem !important;
+}
+
+/* Ensure all pages have proper bottom spacing */
+.container {
+  padding-bottom: 3rem;
+}
+
+/* Specific spacing for pages with cards */
+.card:last-child {
+  margin-bottom: 2rem;
+}
+
+/* Ensure proper spacing for authentication pages */
+.mt-5 {
+  margin-bottom: 2rem !important;
 }
 
 /* Connection Cards */
@@ -139,6 +168,58 @@ body {
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
+/* Welcome page specific styles */
+.hero-section {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border-radius: 15px;
+  margin-bottom: 3rem;
+}
+
+.hero-section .display-4 {
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.hero-section .lead {
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+/* Stats cards */
+.card.shadow-sm {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card.shadow-sm:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+/* Feature cards */
+.card.border-0.shadow-sm {
+  transition: all 0.3s ease;
+}
+
+.card.border-0.shadow-sm:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+}
+
+/* Success story cards */
+.card.shadow {
+  transition: all 0.3s ease;
+}
+
+.card.shadow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.15) !important;
+}
+
+/* Call to action section */
+.bg-primary {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .hero-section {
@@ -155,5 +236,10 @@ body {
   
   .connection-card {
     margin-bottom: 1rem;
+  }
+  
+  .hero-section .btn-lg {
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
   }
 }

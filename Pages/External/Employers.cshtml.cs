@@ -7,19 +7,19 @@ namespace EagleConnect.Pages.External;
 
 public class EmployersModel : PageModel
 {
-    private readonly StaticDataService _dataService;
+    private readonly IUserService _userService;
 
-    public EmployersModel(StaticDataService dataService)
+    public EmployersModel(IUserService userService)
     {
-        _dataService = dataService;
+        _userService = userService;
     }
 
-    public List<User> Employers { get; set; } = new List<User>();
+    public List<ApplicationUser> Employers { get; set; } = new List<ApplicationUser>();
     public List<string> Companies { get; set; } = new List<string>();
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        Employers = _dataService.GetUsersByType(UserType.External);
+        Employers = await _userService.GetUsersByTypeAsync(UserType.External);
         Companies = Employers.Select(e => e.Company).Distinct().ToList();
     }
 }

@@ -1,0 +1,92 @@
+@page
+@model EagleConnect.Pages.Posts.MyPostsModel
+@{
+    ViewData["Title"] = "My Connection Posts";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-bullhorn"></i> My Connection Posts</h2>
+                <a asp-page="Create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create New Post
+                </a>
+            </div>
+
+            @if (Model.MyPosts.Any())
+            {
+                <div class="row">
+                    @foreach (var post in Model.MyPosts)
+                    {
+                        <div class="col-lg-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title mb-1">@post.Title</h5>
+                                        <div>
+                                            @if (post.Status == EagleConnect.Models.PostStatus.Active)
+                                            {
+                                                <span class="badge bg-success">Active</span>
+                                            }
+                                            else if (post.Status == EagleConnect.Models.PostStatus.Closed)
+                                            {
+                                                <span class="badge bg-secondary">Closed</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">Pending</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="card-text text-muted mb-2">
+                                        <i class="fas fa-map-marker-alt me-1"></i>@post.Location
+                                    </p>
+                                    
+                                    <p class="card-text">@post.Description</p>
+                                    
+                                    <div class="mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>Posted @post.PostedDate.ToString("MMM dd, yyyy")
+                                            @if (post.Deadline.HasValue)
+                                            {
+                                                <span class="ms-3"><i class="fas fa-calendar me-1"></i>Deadline @post.Deadline.Value.ToString("MMM dd")</span>
+                                            }
+                                        </small>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        @if (post.Status == EagleConnect.Models.PostStatus.Active)
+                                        {
+                                            <form method="post" asp-page-handler="Close" asp-route-id="@post.Id" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-warning btn-sm">Close Post</button>
+                                            </form>
+                                        }
+                                        <form method="post" asp-page-handler="Delete" asp-route-id="@post.Id" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                                    onclick="return confirm('Are you sure you want to delete this post?')">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Posts Yet</h4>
+                    <p class="text-muted">You haven't created any connection posts yet.</p>
+                    <a asp-page="Create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Your First Post
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

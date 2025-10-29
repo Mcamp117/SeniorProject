@@ -1,0 +1,134 @@
+@page
+@model EagleConnect.Pages.Account.ProfileModel
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="fas fa-user"></i> My Profile</h3>
+                </div>
+                <div class="card-body">
+                    @if (Model.CurrentUser != null)
+                    {
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <div class="profile-image-container mb-3">
+                                    @if (!string.IsNullOrEmpty(Model.CurrentUser.ProfileImage))
+                                    {
+                                        <img src="@Model.CurrentUser.ProfileImage" alt="Profile Image" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; margin: 0 auto;">
+                                            <i class="fas fa-user fa-3x text-white"></i>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h4>@Model.CurrentUser.FirstName @Model.CurrentUser.LastName</h4>
+                                <p class="text-muted">@Model.CurrentUser.Email</p>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-sm-6">
+                                        <strong>User Type:</strong>
+                                        <span class="badge bg-info">@Model.CurrentUser.Type</span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <strong>Member Since:</strong>
+                                        <span>@Model.CurrentUser.CreatedAt.ToString("MMMM yyyy")</span>
+                                    </div>
+                                </div>
+
+                                @* Major removed *@
+
+                                @if (!string.IsNullOrEmpty(Model.CurrentUser.Year))
+                                {
+                                    <div class="mb-3">
+                                        <strong>Year:</strong> @Model.CurrentUser.Year
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(Model.CurrentUser.Company))
+                                {
+                                    <div class="mb-3">
+                                        <strong>Company:</strong> @Model.CurrentUser.Company
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(Model.CurrentUser.JobTitle))
+                                {
+                                    <div class="mb-3">
+                                        <strong>Job Title:</strong> @Model.CurrentUser.JobTitle
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(Model.CurrentUser.Bio))
+                                {
+                                    <div class="mb-3">
+                                        <strong>Bio:</strong>
+                                        <p class="mt-1">@Model.CurrentUser.Bio</p>
+                                    </div>
+                                }
+
+                                @{ var skillNames = Model.CurrentUser.UserSkills.Select(us => us.Skill!.Name).ToList(); }
+                                @if (skillNames.Any())
+                                {
+                                    <div class="mb-3">
+                                        <strong>Skills:</strong>
+                                        <div class="mt-1">
+                                            @foreach (var s in skillNames)
+                                            {
+                                                <span class="badge bg-secondary me-1">@s</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <h4>Profile Not Found</h4>
+                            <p>Unable to load your profile information. Please try logging in again.</p>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" disabled>Edit Profile</button>
+                        <button class="btn btn-outline-secondary" disabled>Change Password</button>
+                    </div>
+                    <small class="text-muted">Profile editing features coming soon!</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-line"></i> Quick Stats</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <h3 class="text-primary">0</h3>
+                        <small class="text-muted">Connections</small>
+                    </div>
+                    <div class="text-center mb-3">
+                        <h3 class="text-success">0</h3>
+                        <small class="text-muted">Posts</small>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-info">0</h3>
+                        <small class="text-muted">Messages</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

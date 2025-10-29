@@ -7,20 +7,20 @@ namespace EagleConnect.Pages.Alumni;
 
 public class NetworkingModel : PageModel
 {
-    private readonly StaticDataService _dataService;
+    private readonly IUserService _userService;
 
-    public NetworkingModel(StaticDataService dataService)
+    public NetworkingModel(IUserService userService)
     {
-        _dataService = dataService;
+        _userService = userService;
     }
 
-    public List<User> Alumni { get; set; } = new List<User>();
+    public List<ApplicationUser> Alumni { get; set; } = new List<ApplicationUser>();
     public List<string> Industries { get; set; } = new List<string>();
     public List<string> Companies { get; set; } = new List<string>();
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        Alumni = _dataService.GetUsersByType(UserType.Alumni);
+        Alumni = await _userService.GetUsersByTypeAsync(UserType.Alumni);
         Industries = Alumni.Select(a => GetIndustryFromCompany(a.Company)).Distinct().ToList();
         Companies = Alumni.Select(a => a.Company).Distinct().ToList();
     }

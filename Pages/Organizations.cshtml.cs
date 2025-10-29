@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using EagleConnect.Services;
@@ -5,21 +6,24 @@ using EagleConnect.Models;
 
 namespace EagleConnect.Pages;
 
+[Authorize]
 public class OrganizationsModel : PageModel
 {
-    private readonly StaticDataService _dataService;
+    private readonly IStudentOrganizationService _organizationService;
+    private readonly IUserService _userService;
 
-    public OrganizationsModel(StaticDataService dataService)
+    public OrganizationsModel(IStudentOrganizationService organizationService, IUserService userService)
     {
-        _dataService = dataService;
+        _organizationService = organizationService;
+        _userService = userService;
     }
 
     public List<StudentOrganization> Organizations { get; set; } = new List<StudentOrganization>();
-    public List<User> Users { get; set; } = new List<User>();
+    public List<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        Organizations = _dataService.Organizations;
-        Users = _dataService.Users;
+        Organizations = await _organizationService.GetActiveOrganizationsAsync();
+        Users = await _userService.GetAllUsersAsync();
     }
 }

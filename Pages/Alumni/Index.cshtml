@@ -32,7 +32,7 @@
         <div class="col-md-4">
             <div class="card bg-info text-white">
                 <div class="card-body text-center">
-                    <h3>@Model.Alumni.SelectMany(a => a.Skills).Distinct().Count()</h3>
+                    <h3>@Model.Alumni.SelectMany(a => a.UserSkills.Select(us => us.Skill!.Name)).Distinct().Count()</h3>
                     <p class="mb-0">Skill Areas</p>
                 </div>
             </div>
@@ -53,19 +53,23 @@
                                 <h5 class="card-title">@alum.FirstName @alum.LastName</h5>
                                 <p class="card-text">
                                     <strong>@alum.JobTitle</strong> at @alum.Company<br>
-                                    <small class="text-muted">@alum.Major '@alum.GraduationYear</small>
+                                    <small class="text-muted">Class of @alum.GraduationYear</small>
                                 </p>
                                 <p class="card-text">@alum.Bio</p>
-                                <div class="mb-2">
-                                    @foreach (var skill in alum.Skills.Take(3))
-                                    {
-                                        <span class="badge bg-secondary me-1">@skill</span>
-                                    }
-                                    @if (alum.Skills.Count > 3)
-                                    {
-                                        <span class="badge bg-light text-dark">+@(alum.Skills.Count - 3) more</span>
-                                    }
-                                </div>
+                                @{ var skillNames = alum.UserSkills.Select(us => us.Skill!.Name).ToList(); }
+                                @if (skillNames.Any())
+                                {
+                                    <div class="mb-2">
+                                        @foreach (var s in skillNames.Take(3))
+                                        {
+                                            <span class="badge bg-secondary me-1">@s</span>
+                                        }
+                                        @if (skillNames.Count > 3)
+                                        {
+                                            <span class="badge bg-light text-dark">+@(skillNames.Count - 3) more</span>
+                                        }
+                                    </div>
+                                }
                                 <a href="mailto:@alum.Email" class="btn btn-primary btn-sm">Contact</a>
                             </div>
                         </div>

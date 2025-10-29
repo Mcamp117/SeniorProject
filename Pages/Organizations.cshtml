@@ -24,7 +24,7 @@
         <div class="col-md-4">
             <div class="card bg-success text-white">
                 <div class="card-body text-center">
-                    <h3>@Model.Organizations.SelectMany(o => o.MemberIds).Distinct().Count()</h3>
+                    <h3>@Model.Organizations.SelectMany(o => o.Members.Where(m => m.IsActive).Select(m => m.UserId)).Distinct().Count()</h3>
                     <p class="mb-0">Active Members</p>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                         <h5 class="card-title">@org.Name</h5>
                         <p class="card-text">
                             <span class="badge bg-primary">@org.Category</span>
-                            <span class="badge bg-secondary">@org.MemberIds.Count members</span>
+                            <span class="badge bg-secondary">@org.Members.Count(m => m.IsActive) members</span>
                         </p>
                         <p class="card-text">@org.Description</p>
                         
@@ -84,7 +84,7 @@
         }
     </div>
 
-    <div class="row mt-5">
+    <div class="row mt-5 mb-5">
         <div class="col-12">
             <div class="card">
                 <div class="card-header bg-primary text-white">

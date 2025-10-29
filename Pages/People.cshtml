@@ -33,12 +33,12 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label for="major" class="form-label">Major/Field</label>
-                            <select class="form-select" id="major" name="major">
-                                <option value="">All Majors</option>
-                                @foreach (var major in Model.AvailableMajors)
+                            <label for="skill" class="form-label">Skill</label>
+                            <select class="form-select" id="skill" name="skill">
+                                <option value="">All Skills</option>
+                                @foreach (var skill in Model.AvailableSkills)
                                 {
-                                    <option value="@major" selected="@(Model.SelectedMajor == major)">@major</option>
+                                    <option value="@skill.Id" selected="@(Model.SelectedSkill == skill.Id.ToString())">@skill.Name</option>
                                 }
                             </select>
                         </div>
@@ -75,7 +75,16 @@
                 <div class="card h-100 person-card">
                     <div class="card-body">
                         <div class="d-flex align-items-start mb-3">
-                            <img src="@user.ProfileImage" alt="@user.FirstName @user.LastName" class="img-fluid rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                            @if (!string.IsNullOrEmpty(user.ProfileImage))
+                            {
+                                <img src="@user.ProfileImage" alt="@user.FirstName @user.LastName" class="img-fluid rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                            }
                             <div class="flex-grow-1">
                                 <h5 class="card-title mb-1">@user.FirstName @user.LastName</h5>
                                 <p class="card-text text-muted mb-1">
@@ -102,9 +111,11 @@
                                         <strong>@user.JobTitle</strong> at @user.Company
                                     </p>
                                 }
-                                @if (!string.IsNullOrEmpty(user.Major))
+                                @* Major removed; show top skills or year *@
+                                @{ var topSkills = user.UserSkills.Select(us => us.Skill!.Name).Take(2).ToList(); }
+                                @if (topSkills.Any())
                                 {
-                                    <p class="card-text small text-muted">@user.Major</p>
+                                    <p class="card-text small text-muted">@string.Join(", ", topSkills)</p>
                                 }
                             </div>
                         </div>
@@ -114,16 +125,17 @@
                             <p class="card-text small">@user.Bio</p>
                         }
                         
-                        @if (user.Skills.Any())
+                        @{ var skillNames = user.UserSkills.Select(us => us.Skill!.Name).ToList(); }
+                        @if (skillNames.Any())
                         {
                             <div class="mb-3">
-                                @foreach (var skill in user.Skills.Take(3))
+                                @foreach (var s in skillNames.Take(3))
                                 {
-                                    <span class="badge bg-secondary me-1">@skill</span>
+                                    <span class="badge bg-secondary me-1">@s</span>
                                 }
-                                @if (user.Skills.Count > 3)
+                                @if (skillNames.Count > 3)
                                 {
-                                    <span class="badge bg-light text-dark">+@(user.Skills.Count - 3) more</span>
+                                    <span class="badge bg-light text-dark">+@(skillNames.Count - 3) more</span>
                                 }
                             </div>
                         }

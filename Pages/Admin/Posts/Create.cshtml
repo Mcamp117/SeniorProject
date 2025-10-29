@@ -1,0 +1,122 @@
+@page
+@model EagleConnect.Pages.Admin.Posts.CreateModel
+@{
+    ViewData["Title"] = "Create Connection Post";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Create Post</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Item.Title" class="form-label"></label>
+                            <input asp-for="Item.Title" class="form-control" />
+                            <span asp-validation-for="Item.Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Item.Description" class="form-label"></label>
+                            <textarea asp-for="Item.Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Item.Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Item.Type" class="form-label"></label>
+                                <select asp-for="Item.Type" class="form-select">
+                                    <option value="@EagleConnect.Models.ConnectionType.Mentorship">Mentorship</option>
+                                    <option value="@EagleConnect.Models.ConnectionType.StudyPartner">Study Partner</option>
+                                    <option value="@EagleConnect.Models.ConnectionType.ProjectCollaboration">Project Collaboration</option>
+                                    <option value="@EagleConnect.Models.ConnectionType.Networking">Networking</option>
+                                    <option value="@EagleConnect.Models.ConnectionType.Research">Research</option>
+                                    <option value="@EagleConnect.Models.ConnectionType.Internship">Internship</option>
+                                    <option value="@EagleConnect.Models.ConnectionType.Volunteer">Volunteer</option>
+                                    <option value="@EagleConnect.Models.ConnectionType.Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Item.Seeking" class="form-label"></label>
+                                <select asp-for="Item.Seeking" class="form-select">
+                                    <option value="@EagleConnect.Models.SeekingType.Mentor">Mentor</option>
+                                    <option value="@EagleConnect.Models.SeekingType.Mentee">Mentee</option>
+                                    <option value="@EagleConnect.Models.SeekingType.StudyPartner">Study Partner</option>
+                                    <option value="@EagleConnect.Models.SeekingType.Collaborator">Collaborator</option>
+                                    <option value="@EagleConnect.Models.SeekingType.Network">Network</option>
+                                    <option value="@EagleConnect.Models.SeekingType.ResearchPartner">Research Partner</option>
+                                    <option value="@EagleConnect.Models.SeekingType.Intern">Intern</option>
+                                    <option value="@EagleConnect.Models.SeekingType.Volunteer">Volunteer</option>
+                                    <option value="@EagleConnect.Models.SeekingType.Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Item.Location" class="form-label"></label>
+                                <input asp-for="Item.Location" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Item.PosterId" class="form-label">Poster</label>
+                                <select asp-for="Item.PosterId" class="form-select">
+                                    <option value="">-- Select Poster --</option>
+                                    @foreach (var u in Model.Users)
+                                    {
+                                        <option value="@u.Id">@u.FirstName @u.LastName (@u.Email)</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Item.PosterId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Item.Deadline" class="form-label"></label>
+                                <input asp-for="Item.Deadline" class="form-control" type="date" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Item.Status" class="form-label"></label>
+                                <select asp-for="Item.Status" class="form-select">
+                                    <option value="@EagleConnect.Models.PostStatus.Active">Active</option>
+                                    <option value="@EagleConnect.Models.PostStatus.Pending">Pending</option>
+                                    <option value="@EagleConnect.Models.PostStatus.Closed">Closed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Item.Skills" class="form-label"></label>
+                            <input asp-for="Item.Skills" class="form-control" placeholder="Comma-separated (e.g., C#, Azure, Leadership)" />
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Item.Requirements" class="form-label"></label>
+                            <textarea asp-for="Item.Requirements" class="form-control" rows="3" placeholder="Comma-separated list"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Item.ContactInfo" class="form-label"></label>
+                            <input asp-for="Item.ContactInfo" class="form-control" placeholder="email@example.com or contact URL" />
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

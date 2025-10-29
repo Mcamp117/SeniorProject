@@ -7,19 +7,21 @@ namespace EagleConnect.Pages.Alumni;
 
 public class MentorshipModel : PageModel
 {
-    private readonly StaticDataService _dataService;
+    private readonly IRelationshipService _relationshipService;
+    private readonly IUserService _userService;
 
-    public MentorshipModel(StaticDataService dataService)
+    public MentorshipModel(IRelationshipService relationshipService, IUserService userService)
     {
-        _dataService = dataService;
+        _relationshipService = relationshipService;
+        _userService = userService;
     }
 
     public List<Relationship> Mentorships { get; set; } = new List<Relationship>();
-    public List<User> AvailableMentors { get; set; } = new List<User>();
+    public List<ApplicationUser> AvailableMentors { get; set; } = new List<ApplicationUser>();
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        Mentorships = _dataService.GetRelationshipsByType(RelationshipType.AlumniStudent);
-        AvailableMentors = _dataService.GetUsersByType(UserType.Alumni);
+        Mentorships = await _relationshipService.GetRelationshipsByTypeAsync(RelationshipType.AlumniStudent);
+        AvailableMentors = await _userService.GetUsersByTypeAsync(UserType.Alumni);
     }
 }

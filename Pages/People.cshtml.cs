@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using EagleConnect.Services;
@@ -5,31 +6,34 @@ using EagleConnect.Models;
 
 namespace EagleConnect.Pages;
 
+[Authorize]
 public class PeopleModel : PageModel
 {
-    private readonly StaticDataService _dataService;
+    private readonly IUserService _userService;
+    private readonly ISkillService _skillService;
 
-    public PeopleModel(StaticDataService dataService)
+    public PeopleModel(IUserService userService, ISkillService skillService)
     {
-        _dataService = dataService;
+        _userService = userService;
+        _skillService = skillService;
     }
 
-    public List<User> AllUsers { get; set; } = new List<User>();
-    public List<User> FilteredUsers { get; set; } = new List<User>();
+    public List<ApplicationUser> AllUsers { get; set; } = new List<ApplicationUser>();
+    public List<ApplicationUser> FilteredUsers { get; set; } = new List<ApplicationUser>();
     public string SearchTerm { get; set; } = string.Empty;
     public string SelectedType { get; set; } = string.Empty;
-    public string SelectedMajor { get; set; } = string.Empty;
-    public List<string> AvailableMajors { get; set; } = new List<string>();
+    public string SelectedSkill { get; set; } = string.Empty;
+    public List<Skill> AvailableSkills { get; set; } = new List<Skill>();
 
-    public void OnGet(string search, string type, string major)
+    public async Task OnGetAsync(string search, string type, string skill)
     {
-        AllUsers = _dataService.Users;
+        AllUsers = await _userService.GetAllUsersAsync();
         SearchTerm = search ?? string.Empty;
         SelectedType = type ?? string.Empty;
-        SelectedMajor = major ?? string.Empty;
+        SelectedSkill = skill ?? string.Empty;
 
-        // Get available majors for filter dropdown
-        AvailableMajors = AllUsers.Select(u => u.Major).Where(m => !string.IsNullOrEmpty(m)).Distinct().OrderBy(m => m).ToList();
+        // Get available skills for filter dropdown
+        AvailableSkills = await _skillService.GetAllSkillsAsync();
 
         // Apply filters
         var query = AllUsers.AsQueryable();
@@ -41,7 +45,7 @@ public class PeopleModel : PageModel
                 u.LastName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.Company.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.JobTitle.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                u.Skills.Any(s => s.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+                u.UserSkills.Any(us => us.Skill!.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
             );
         }
 
@@ -53,9 +57,12 @@ public class PeopleModel : PageModel
             }
         }
 
-        if (!string.IsNullOrEmpty(SelectedMajor))
+        if (!string.IsNullOrEmpty(SelectedSkill))
         {
-            query = query.Where(u => u.Major.Contains(SelectedMajor, StringComparison.OrdinalIgnoreCase));
+            if (int.TryParse(SelectedSkill, out var skillId))
+            {
+                query = query.Where(u => u.UserSkills.Any(us => us.SkillId == skillId));
+            }
         }
 
         FilteredUsers = query.ToList();

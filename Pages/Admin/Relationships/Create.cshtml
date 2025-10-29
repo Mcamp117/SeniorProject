@@ -1,0 +1,92 @@
+@page
+@model EagleConnect.Pages.Admin.Relationships.CreateModel
+@{
+    ViewData["Title"] = "Create Relationship";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Create Relationship</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mentor</label>
+                            <select asp-for="Item.MentorId" class="form-select">
+                                <option value="">-- Select Mentor --</option>
+                                @foreach (var u in Model.Users)
+                                {
+                                    <option value="@u.Id">@u.FirstName @u.LastName (@u.Email)</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Item.MentorId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mentee</label>
+                            <select asp-for="Item.MenteeId" class="form-select">
+                                <option value="">-- Select Mentee --</option>
+                                @foreach (var u in Model.Users)
+                                {
+                                    <option value="@u.Id">@u.FirstName @u.LastName (@u.Email)</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Item.MenteeId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Item.Type" class="form-label"></label>
+                            <select asp-for="Item.Type" class="form-select">
+                                <option value="@EagleConnect.Models.RelationshipType.AlumniStudent">Alumni - Student</option>
+                                <option value="@EagleConnect.Models.RelationshipType.ExternalStudent">External - Student</option>
+                                <option value="@EagleConnect.Models.RelationshipType.StudentStudent">Student - Student</option>
+                                <option value="@EagleConnect.Models.RelationshipType.FacultyStudent">Faculty - Student</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Item.Status" class="form-label"></label>
+                            <select asp-for="Item.Status" class="form-select">
+                                <option value="Pending">Pending</option>
+                                <option value="Active">Active</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Item.Notes" class="form-label"></label>
+                            <textarea asp-for="Item.Notes" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Item.StartedDate" class="form-label"></label>
+                                <input asp-for="Item.StartedDate" class="form-control" type="date" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Item.EndedDate" class="form-label"></label>
+                                <input asp-for="Item.EndedDate" class="form-control" type="date" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

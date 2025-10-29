@@ -1,0 +1,298 @@
+@page
+@model EagleConnect.Pages.Admin.Users.DetailsModel
+@{
+    ViewData["Title"] = "User Details";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user"></i> User Details</h2>
+                <div>
+                    <a asp-page="/Admin/Users/Edit" asp-route-id="@Model.UserModel.Id" class="btn btn-primary me-2">
+                        <i class="fas fa-edit"></i> Edit User
+                    </a>
+                    <a asp-page="/Admin/Users/Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Users
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- User Profile Card -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            @if (!string.IsNullOrEmpty(Model.UserModel.ProfileImage))
+                            {
+                                <img src="@Model.UserModel.ProfileImage" alt="@Model.UserModel.FirstName @Model.UserModel.LastName" 
+                                     class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mb-3 mx-auto" 
+                                     style="width: 120px; height: 120px;">
+                                    <i class="fas fa-user text-white" style="font-size: 48px;"></i>
+                                </div>
+                            }
+                            
+                            <h4 class="card-title">@Model.UserModel.FirstName @Model.UserModel.LastName</h4>
+                            <p class="text-muted">@Model.UserModel.Email</p>
+                            
+                            <div class="mb-3">
+                                <span class="badge bg-@(Model.UserModel.Type.ToString() switch {
+                                    "Student" => "primary",
+                                    "Alumni" => "success", 
+                                    "Faculty" => "info",
+                                    "External" => "warning",
+                                    _ => "secondary"
+                                }) fs-6">@Model.UserModel.Type</span>
+                            </div>
+
+                            @if (Model.UserRoles.Any())
+                            {
+                                <div class="mb-3">
+                                    @foreach (var role in Model.UserRoles)
+                                    {
+                                        <span class="badge bg-@(role == "Admin" ? "danger" : "secondary") me-1">@role</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Quick Stats</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <h5 class="text-primary">@Model.UserModel.UserSkills.Count</h5>
+                                        <small class="text-muted">Skills</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h5 class="text-success">@Model.UserModel.ConnectionPosts.Count</h5>
+                                    <small class="text-muted">Posts</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Information -->
+                <div class="col-md-8">
+                    <!-- Basic Information -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-info-circle"></i> Basic Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">First Name:</dt>
+                                        <dd class="col-sm-8">@Model.UserModel.FirstName</dd>
+                                        
+                                        <dt class="col-sm-4">Last Name:</dt>
+                                        <dd class="col-sm-8">@Model.UserModel.LastName</dd>
+                                        
+                                        <dt class="col-sm-4">Email:</dt>
+                                        <dd class="col-sm-8">@Model.UserModel.Email</dd>
+                                        
+                                        <dt class="col-sm-4">User Type:</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge bg-@(Model.UserModel.Type.ToString() switch {
+                                                "Student" => "primary",
+                                                "Alumni" => "success", 
+                                                "Faculty" => "info",
+                                                "External" => "warning",
+                                                _ => "secondary"
+                                            })">@Model.UserModel.Type</span>
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Year:</dt>
+                                        <dd class="col-sm-8">@Model.UserModel.Year</dd>
+                                        
+                                        <dt class="col-sm-4">Company:</dt>
+                                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.UserModel.Company) ? "Not specified" : Model.UserModel.Company)</dd>
+                                        
+                                        <dt class="col-sm-4">Job Title:</dt>
+                                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.UserModel.JobTitle) ? "Not specified" : Model.UserModel.JobTitle)</dd>
+                                        
+                                        <dt class="col-sm-4">Graduation Year:</dt>
+                                        <dd class="col-sm-8">@(Model.UserModel.GraduationYear == 0 ? "Not specified" : Model.UserModel.GraduationYear.ToString())</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(Model.UserModel.Bio))
+                            {
+                                <hr>
+                                <h6>Bio</h6>
+                                <p class="text-muted">@Model.UserModel.Bio</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-tags"></i> Skills (@Model.UserModel.UserSkills.Count)</h5>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.UserModel.UserSkills.Any())
+                            {
+                                <div class="row">
+                                    @foreach (var userSkill in Model.UserModel.UserSkills)
+                                    {
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card border">
+                                                <div class="card-body py-2">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <h6 class="mb-1">@userSkill.Skill?.Name</h6>
+                                                            <small class="text-muted">@userSkill.ProficiencyLevel</small>
+                                                        </div>
+                                                        <span class="badge bg-@(userSkill.Skill?.Category.ToString() switch {
+                                                            "Academic" => "primary",
+                                                            "Technical" => "success",
+                                                            "Soft" => "info",
+                                                            "Professional" => "warning",
+                                                            _ => "secondary"
+                                                        })">@userSkill.Skill?.Category</span>
+                                                    </div>
+                                                    @if (!string.IsNullOrEmpty(userSkill.Notes))
+                                                    {
+                                                        <small class="text-muted d-block mt-1">@userSkill.Notes</small>
+                                                    }
+                                                    <small class="text-muted d-block mt-1">
+                                                        Added: @userSkill.AcquiredDate.ToString("MMM dd, yyyy")
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted text-center py-3">No skills assigned</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Recent Posts -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-bullhorn"></i> Recent Posts (@Model.UserModel.ConnectionPosts.Count)</h5>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.UserModel.ConnectionPosts.Any())
+                            {
+                                <div class="list-group list-group-flush">
+                                    @foreach (var post in Model.UserModel.ConnectionPosts.Take(5))
+                                    {
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="mb-1">@post.Title</h6>
+                                                    <p class="mb-1 text-muted">@(post.Description.Length > 100 ? post.Description.Substring(0, 100) + "..." : post.Description)</p>
+                                                    <small class="text-muted">
+                                                        Posted: @post.PostedDate.ToString("MMM dd, yyyy") | 
+                                                        Type: @post.Type | 
+                                                        Status: 
+                                                        <span class="badge bg-@(post.Status.ToString() switch {
+                                                            "Active" => "success",
+                                                            "Closed" => "secondary",
+                                                            "Expired" => "warning",
+                                                            _ => "secondary"
+                                                        })">@post.Status</span>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                @if (Model.UserModel.ConnectionPosts.Count > 5)
+                                {
+                                    <div class="text-center mt-3">
+                                        <small class="text-muted">Showing 5 of @Model.UserModel.ConnectionPosts.Count posts</small>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p class="text-muted text-center py-3">No posts created</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Account Information -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-cog"></i> Account Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">Account Created:</dt>
+                                        <dd class="col-sm-7">@Model.UserModel.CreatedAt.ToString("MMM dd, yyyy")</dd>
+                                        
+                                        <dt class="col-sm-5">Last Login:</dt>
+                                        <dd class="col-sm-7">
+                                            @if (Model.UserModel.LastLoginAt.HasValue)
+                                            {
+                                                @Model.UserModel.LastLoginAt.Value.ToString("MMM dd, yyyy")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Never</span>
+                                            }
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">Email Confirmed:</dt>
+                                        <dd class="col-sm-7">
+                                            @if (Model.UserModel.EmailConfirmed)
+                                            {
+                                                <span class="badge bg-success">Confirmed</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">Not Confirmed</span>
+                                            }
+                                        </dd>
+                                        
+                                        <dt class="col-sm-5">Two Factor:</dt>
+                                        <dd class="col-sm-7">
+                                            @if (Model.UserModel.TwoFactorEnabled)
+                                            {
+                                                <span class="badge bg-success">Enabled</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Disabled</span>
+                                            }
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

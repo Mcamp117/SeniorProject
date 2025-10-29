@@ -1,0 +1,168 @@
+@page
+@model EagleConnect.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h2>
+                <div class="text-muted">
+                    <i class="fas fa-shield-alt"></i> Admin Panel
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@Model.TotalUsers</h4>
+                                    <p class="mb-0">Total Users</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-users fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@Model.TotalSkills</h4>
+                                    <p class="mb-0">Skills</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-tags fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@Model.ActiveOrganizations</h4>
+                                    <p class="mb-0">Active Organizations</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-building fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@Model.ActiveRelationships</h4>
+                                    <p class="mb-0">Active Relationships</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-handshake fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Stats -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-pie"></i> User Breakdown</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <h4 class="text-primary">@Model.TotalStudents</h4>
+                                    <small class="text-muted">Students</small>
+                                </div>
+                                <div class="col-4">
+                                    <h4 class="text-success">@Model.TotalAlumni</h4>
+                                    <small class="text-muted">Alumni</small>
+                                </div>
+                                <div class="col-4">
+                                    <h4 class="text-info">@(Model.TotalUsers - Model.TotalStudents - Model.TotalAlumni)</h4>
+                                    <small class="text-muted">Others</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-bar"></i> Content Overview</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <h4 class="text-success">@Model.ActivePosts</h4>
+                                    <small class="text-muted">Active Posts</small>
+                                </div>
+                                <div class="col-4">
+                                    <h4 class="text-warning">@Model.TotalOrganizations</h4>
+                                    <small class="text-muted">Total Organizations</small>
+                                </div>
+                                <div class="col-4">
+                                    <h4 class="text-info">@Model.TotalRelationships</h4>
+                                    <small class="text-muted">Total Relationships</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-2">
+                                    <a asp-page="/Admin/Skills/Create" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-plus"></i> Add Skill
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a asp-page="/Admin/Organizations/Create" class="btn btn-outline-success w-100">
+                                        <i class="fas fa-plus"></i> Add Organization
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a asp-page="/Admin/Relationships/Create" class="btn btn-outline-info w-100">
+                                        <i class="fas fa-plus"></i> Create Relationship
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a asp-page="/Admin/Posts/Create" class="btn btn-outline-warning w-100">
+                                        <i class="fas fa-plus"></i> Create Post
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

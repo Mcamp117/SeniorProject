@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using EagleConnect.Services;
@@ -5,22 +6,25 @@ using EagleConnect.Models;
 
 namespace EagleConnect.Pages.Alumni;
 
+[Authorize]
 public class IndexModel : PageModel
 {
-    private readonly StaticDataService _dataService;
+    private readonly IUserService _userService;
+    private readonly IRelationshipService _relationshipService;
 
-    public IndexModel(StaticDataService dataService)
+    public IndexModel(IUserService userService, IRelationshipService relationshipService)
     {
-        _dataService = dataService;
+        _userService = userService;
+        _relationshipService = relationshipService;
     }
 
-    public List<User> Alumni { get; set; } = new List<User>();
+    public List<ApplicationUser> Alumni { get; set; } = new List<ApplicationUser>();
     public List<Relationship> ActiveMentorships { get; set; } = new List<Relationship>();
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        Alumni = _dataService.GetUsersByType(UserType.Alumni);
-        ActiveMentorships = _dataService.GetRelationshipsByType(RelationshipType.AlumniStudent)
-            .Where(r => r.Status == "Active").ToList();
+        Alumni = await _userService.GetUsersByTypeAsync(UserType.Alumni);
+        var allMentorships = await _relationshipService.GetRelationshipsByTypeAsync(RelationshipType.AlumniStudent);
+        ActiveMentorships = allMentorships.Where(r => r.Status == "Active").ToList();
     }
 }

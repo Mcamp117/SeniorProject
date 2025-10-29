@@ -48,16 +48,20 @@
                                     <span class="badge bg-info">External Mentor</span>
                                 </p>
                                 <p class="card-text">@mentor.Bio</p>
-                                <div class="mb-2">
-                                    @foreach (var skill in mentor.Skills.Take(3))
-                                    {
-                                        <span class="badge bg-secondary me-1">@skill</span>
-                                    }
-                                    @if (mentor.Skills.Count > 3)
-                                    {
-                                        <span class="badge bg-light text-dark">+@(mentor.Skills.Count - 3) more</span>
-                                    }
-                                </div>
+                                @{ var skillNames = mentor.UserSkills.Select(us => us.Skill!.Name).ToList(); }
+                                @if (skillNames.Any())
+                                {
+                                    <div class="mb-2">
+                                        @foreach (var s in skillNames.Take(3))
+                                        {
+                                            <span class="badge bg-secondary me-1">@s</span>
+                                        }
+                                        @if (skillNames.Count > 3)
+                                        {
+                                            <span class="badge bg-light text-dark">+@(skillNames.Count - 3) more</span>
+                                        }
+                                    </div>
+                                }
                                 <a href="mailto:@mentor.Email" class="btn btn-primary btn-sm">Contact Mentor</a>
                             </div>
                         </div>

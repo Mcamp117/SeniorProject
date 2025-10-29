@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using EagleConnect.Services;
@@ -5,21 +6,24 @@ using EagleConnect.Models;
 
 namespace EagleConnect.Pages.External;
 
+[Authorize]
 public class IndexModel : PageModel
 {
-    private readonly StaticDataService _dataService;
+    private readonly IUserService _userService;
+    private readonly IRelationshipService _relationshipService;
 
-    public IndexModel(StaticDataService dataService)
+    public IndexModel(IUserService userService, IRelationshipService relationshipService)
     {
-        _dataService = dataService;
+        _userService = userService;
+        _relationshipService = relationshipService;
     }
 
-    public List<User> ExternalMentors { get; set; } = new List<User>();
+    public List<ApplicationUser> ExternalMentors { get; set; } = new List<ApplicationUser>();
     public List<Relationship> ExternalMentorships { get; set; } = new List<Relationship>();
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        ExternalMentors = _dataService.GetUsersByType(UserType.External);
-        ExternalMentorships = _dataService.GetRelationshipsByType(RelationshipType.ExternalStudent);
+        ExternalMentors = await _userService.GetUsersByTypeAsync(UserType.External);
+        ExternalMentorships = await _relationshipService.GetRelationshipsByTypeAsync(RelationshipType.ExternalStudent);
     }
 }

@@ -17,12 +17,14 @@ namespace EagleConnect.Pages.Account
         public async Task<IActionResult> OnGetAsync()
         {
             await _signInManager.SignOutAsync();
+            TempData.Clear();
             return RedirectToPage("/Welcome");
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             await _signInManager.SignOutAsync();
+            TempData.Clear();
             return RedirectToPage("/Welcome");
         }
     }

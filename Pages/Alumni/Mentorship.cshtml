@@ -1,4 +1,5 @@
 @page
+@using EagleConnect.Models
 @model EagleConnect.Pages.Alumni.MentorshipModel
 @{
     ViewData["Title"] = "Mentorship Program";
@@ -6,9 +7,17 @@
 
 <div class="container">
     <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="display-5 fw-bold text-primary">Alumni Mentorship Program</h1>
-            <p class="lead">Connect with experienced alumni who can guide you through your academic and career journey.</p>
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-5 fw-bold text-primary">Alumni Mentorship Program</h1>
+                <p class="lead">Connect with experienced alumni who can guide you through your academic and career journey.</p>
+            </div>
+            @if (Model.CanCreateMentorshipPost())
+            {
+                <a asp-page="/Posts/Create" asp-route-type="Mentorship" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus"></i> Create Mentorship Post
+                </a>
+            }
         </div>
     </div>
 
@@ -63,6 +72,88 @@
                     @if (Model.AvailableMentors.Count > 5)
                     {
                         <p class="text-muted">And @(Model.AvailableMentors.Count - 5) more mentors available...</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mentorship Posts Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-bullhorn"></i> Mentorship Posts</h5>
+                    <span class="badge bg-light text-primary">@Model.MentorshipPosts.Count posts</span>
+                </div>
+                <div class="card-body">
+                    @if (Model.MentorshipPosts.Any())
+                    {
+                        @foreach (var post in Model.MentorshipPosts)
+                        {
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h5 class="card-title mb-1">@post.Title</h5>
+                                            <p class="card-text mb-2">@post.Description</p>
+                                            <small class="text-muted">
+                                                <i class="fas fa-user"></i> Posted by @post.Poster?.FirstName @post.Poster?.LastName
+                                                <span class="ms-2"><i class="fas fa-calendar"></i> @post.PostedDate.ToString("MMM dd, yyyy")</span>
+                                            </small>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-primary">@post.Type</span>
+                                            @if (post.Status == PostStatus.Active)
+                                            {
+                                                <span class="badge bg-success">Active</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    
+                                    @if (!string.IsNullOrEmpty(post.Location))
+                                    {
+                                        <p class="mb-1"><small><i class="fas fa-map-marker-alt"></i> @post.Location</small></p>
+                                    }
+                                    
+                                    @if (post.Deadline.HasValue)
+                                    {
+                                        <p class="mb-2"><small><i class="fas fa-calendar-times"></i> Deadline: @post.Deadline.Value.ToString("MMM dd, yyyy")</small></p>
+                                    }
+                                    
+                                    <div class="d-flex gap-2 mt-2">
+                                        @if (Model.CurrentUser != null && post.PosterId != Model.CurrentUser.Id)
+                                        {
+                                            var isConnected = Model.ConnectionStatuses.ContainsKey(post.PosterId) && Model.ConnectionStatuses[post.PosterId];
+                                            var connection = await Model.GetConnectionIdAsync(post.PosterId);
+                                            @if (isConnected && connection.HasValue)
+                                            {
+                                                <a asp-page="/Connections" asp-route-connectionId="@connection.Value" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-comments"></i> Chat
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <form method="post" asp-page="/Connections" asp-page-handler="Connect" class="d-inline">
+                                                    <input type="hidden" name="userId" value="@post.PosterId" />
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-user-plus"></i> Connect
+                                                    </button>
+                                                </form>
+                                            }
+                                        }
+                                        else if (!string.IsNullOrEmpty(post.ContactInfo))
+                                        {
+                                            <a href="mailto:@post.ContactInfo" class="btn btn-primary btn-sm">Contact</a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4">No mentorship posts available yet. @(Model.CanCreateMentorshipPost() ? "Be the first to create one!" : "")</p>
                     }
                 </div>
             </div>

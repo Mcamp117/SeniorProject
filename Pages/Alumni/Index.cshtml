@@ -1,14 +1,15 @@
 @page
-@model EagleConnect.Pages.Alumni.IndexModel
+@using EagleConnect.Models
+@model EagleConnect.Pages.Alumni.NetworkingModel
 @{
-    ViewData["Title"] = "Alumni Directory";
+    ViewData["Title"] = "Alumni Directory & Networking";
 }
 
 <div class="container">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="display-5 fw-bold text-primary">Alumni Directory</h1>
-            <p class="lead">Connect with successful USI alumni who are ready to mentor and guide current students.</p>
+            <h1 class="display-5 fw-bold text-primary">Alumni Directory & Networking</h1>
+            <p class="lead">Connect with successful USI alumni who are ready to mentor and guide current students across various industries and companies.</p>
         </div>
     </div>
 
@@ -32,10 +33,52 @@
         <div class="col-md-4">
             <div class="card bg-info text-white">
                 <div class="card-body text-center">
-                    <h3>@Model.Alumni.SelectMany(a => a.UserSkills.Select(us => us.Skill!.Name)).Distinct().Count()</h3>
-                    <p class="mb-0">Skill Areas</p>
+                    <h3>@Model.Industries.Count</h3>
+                    <p class="mb-0">Industries</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3>Networking by Industry</h3>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        @foreach (var industry in Model.Industries)
+        {
+            var industryAlumni = Model.Alumni.Where(a => GetIndustryFromCompany(a.Company) == industry).ToList();
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">@industry</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">@industryAlumni.Count alumni in this industry</p>
+                        <ul class="list-unstyled">
+                            @foreach (var alum in industryAlumni.Take(3))
+                            {
+                                <li class="mb-1">
+                                    <strong>@alum.FirstName @alum.LastName</strong><br>
+                                    <small class="text-muted">@alum.JobTitle at @alum.Company</small>
+                                </li>
+                            }
+                        </ul>
+                        @if (industryAlumni.Count > 3)
+                        {
+                            <small class="text-muted">And @(industryAlumni.Count - 3) more...</small>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h3>All Alumni Network</h3>
         </div>
     </div>
 
@@ -55,7 +98,10 @@
                                     <strong>@alum.JobTitle</strong> at @alum.Company<br>
                                     <small class="text-muted">Class of @alum.GraduationYear</small>
                                 </p>
-                                <p class="card-text">@alum.Bio</p>
+                                @if (!string.IsNullOrEmpty(alum.Bio))
+                                {
+                                    <p class="card-text">@alum.Bio</p>
+                                }
                                 @{ var skillNames = alum.UserSkills.Select(us => us.Skill!.Name).ToList(); }
                                 @if (skillNames.Any())
                                 {
@@ -70,7 +116,30 @@
                                         }
                                     </div>
                                 }
-                                <a href="mailto:@alum.Email" class="btn btn-primary btn-sm">Contact</a>
+                                @if (Model.CurrentUser != null && alum.Id != Model.CurrentUser.Id)
+                                {
+                                    var isConnected = Model.ConnectionStatuses.ContainsKey(alum.Id) && Model.ConnectionStatuses[alum.Id];
+                                    var connection = await Model.GetConnectionIdAsync(alum.Id);
+                                    @if (isConnected && connection.HasValue)
+                                    {
+                                        <a asp-page="/Connections" asp-route-connectionId="@connection.Value" class="btn btn-success btn-sm">
+                                            <i class="fas fa-comments"></i> Chat
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-page="/Connections" asp-page-handler="Connect" class="d-inline">
+                                            <input type="hidden" name="userId" value="@alum.Id" />
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-user-plus"></i> Connect
+                                            </button>
+                                        </form>
+                                    }
+                                }
+                                else
+                                {
+                                    <a href="mailto:@alum.Email" class="btn btn-outline-primary btn-sm">Contact</a>
+                                }
                             </div>
                         </div>
                     </div>
@@ -79,3 +148,16 @@
         }
     </div>
 </div>
+
+@functions {
+    private string GetIndustryFromCompany(string company)
+    {
+        return company.ToLower() switch
+        {
+            var c when c.Contains("microsoft") || c.Contains("tech") => "Technology",
+            var c when c.Contains("procter") || c.Contains("gamble") => "Consumer Goods",
+            var c when c.Contains("hospital") || c.Contains("medical") => "Healthcare",
+            _ => "Other"
+        };
+    }
+}

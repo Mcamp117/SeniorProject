@@ -19,7 +19,7 @@ public class DetailsModel : PageModel
         _userManager = userManager;
     }
 
-    public ApplicationUser UserModel { get; set; } = new();
+    public ApplicationUser? UserModel { get; set; }
     public List<string> UserRoles { get; set; } = new();
 
     public async Task<IActionResult> OnGetAsync(string id)

@@ -46,7 +46,7 @@ public class IndexModel : PageModel
             filteredUsers = filteredUsers.Where(u => 
                 u.FirstName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.LastName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                u.Email.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase));
+                (!string.IsNullOrEmpty(u.Email) && u.Email.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)));
         }
         
         if (!string.IsNullOrEmpty(SelectedUserType) && Enum.TryParse<UserType>(SelectedUserType, out var userType))

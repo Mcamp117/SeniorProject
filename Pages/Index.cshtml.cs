@@ -13,16 +13,21 @@ public class IndexModel : PageModel
     private readonly IUserService _userService;
     private readonly IStudentOrganizationService _organizationService;
     private readonly IRelationshipService _relationshipService;
+    private readonly IConnectionService _connectionService;
+    private readonly AuthService _authService;
 
     public IndexModel(ILogger<IndexModel> logger, IConnectionPostService connectionPostService, 
         IUserService userService, IStudentOrganizationService organizationService, 
-        IRelationshipService relationshipService)
+        IRelationshipService relationshipService, IConnectionService connectionService,
+        AuthService authService)
     {
         _logger = logger;
         _connectionPostService = connectionPostService;
         _userService = userService;
         _organizationService = organizationService;
         _relationshipService = relationshipService;
+        _connectionService = connectionService;
+        _authService = authService;
     }
 
     public List<ConnectionPost> ActiveConnectionPosts { get; set; } = new List<ConnectionPost>();
@@ -33,6 +38,7 @@ public class IndexModel : PageModel
     public int ActiveRelationships { get; set; }
     public bool IsLoggedIn { get; set; }
     public ApplicationUser? CurrentUser { get; set; }
+    public Dictionary<string, bool> ConnectionStatuses { get; set; } = new();
 
     public async Task OnGetAsync()
     {
@@ -58,7 +64,26 @@ public class IndexModel : PageModel
             if (User.Identity?.Name != null)
             {
                 CurrentUser = await _userService.GetUserByEmailAsync(User.Identity.Name);
+                
+                // Check connection statuses for all posts
+                if (CurrentUser != null)
+                {
+                    foreach (var post in ActiveConnectionPosts)
+                    {
+                        if (post.PosterId != CurrentUser.Id)
+                        {
+                            ConnectionStatuses[post.PosterId] = await _connectionService.AreConnectedAsync(CurrentUser.Id, post.PosterId);
+                        }
+                    }
+                }
             }
         }
+    }
+
+    public async Task<int?> GetConnectionIdAsync(string otherUserId)
+    {
+        if (CurrentUser == null) return null;
+        var connection = await _connectionService.GetConnectionAsync(CurrentUser.Id, otherUserId);
+        return connection?.Id;
     }
 }

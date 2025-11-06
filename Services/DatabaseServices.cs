@@ -72,6 +72,28 @@ namespace EagleConnect.Services
         Task<Dictionary<string, List<string>>> GetUserRolesAsync();
     }
 
+    public interface IConnectionService
+    {
+        Task<Connection?> GetConnectionAsync(string user1Id, string user2Id);
+        Task<Connection?> GetConnectionByIdAsync(int connectionId);
+        Task<List<Connection>> GetUserConnectionsAsync(string userId);
+        Task<List<Connection>> GetPendingConnectionsAsync(string userId);
+        Task<Connection> CreateConnectionAsync(string user1Id, string user2Id);
+        Task<bool> AcceptConnectionAsync(int connectionId, string userId);
+        Task<bool> DeclineConnectionAsync(int connectionId, string userId);
+        Task<bool> AreConnectedAsync(string user1Id, string user2Id);
+        Task<bool> DeleteConnectionAsync(int connectionId);
+    }
+
+    public interface IMessageService
+    {
+        Task<Message> SendMessageAsync(int connectionId, string senderId, string content);
+        Task<List<Message>> GetMessagesAsync(int connectionId, int? skip = null, int? take = null);
+        Task<bool> MarkMessageAsReadAsync(int messageId, string userId);
+        Task<int> GetUnreadMessageCountAsync(string userId);
+        Task<List<Message>> GetUnreadMessagesAsync(string userId);
+    }
+
     public class SkillService : ISkillService
     {
         private readonly ApplicationDbContext _context;
@@ -503,9 +525,30 @@ namespace EagleConnect.Services
 
         public async Task<ApplicationUser> UpdateUserAsync(ApplicationUser user)
         {
-            _context.Users.Update(user);
+            // Load the existing user from the database to avoid concurrency issues
+            var existingUser = await _context.Users.FindAsync(user.Id);
+            if (existingUser == null)
+            {
+                throw new ArgumentException($"User with ID {user.Id} not found.");
+            }
+
+            // Update required properties
+            existingUser.FirstName = user.FirstName;
+            existingUser.LastName = user.LastName;
+            existingUser.Email = user.Email;
+            existingUser.UserName = user.Email; // Keep username in sync with email
+            existingUser.Type = user.Type;
+            existingUser.GraduationYear = user.GraduationYear;
+            
+            // Update optional properties - use empty string if null/whitespace to avoid database null constraint errors
+            existingUser.Year = string.IsNullOrWhiteSpace(user.Year) ? string.Empty : user.Year;
+            existingUser.Bio = string.IsNullOrWhiteSpace(user.Bio) ? string.Empty : user.Bio;
+            existingUser.Company = string.IsNullOrWhiteSpace(user.Company) ? string.Empty : user.Company;
+            existingUser.JobTitle = string.IsNullOrWhiteSpace(user.JobTitle) ? string.Empty : user.JobTitle;
+            existingUser.ProfileImage = string.IsNullOrWhiteSpace(user.ProfileImage) ? "/images/default-avatar.svg" : user.ProfileImage;
+
             await _context.SaveChangesAsync();
-            return user;
+            return existingUser;
         }
 
         public async Task<bool> AddSkillToUserAsync(string userId, int skillId, string proficiencyLevel = "Beginner", string notes = "")
@@ -577,12 +620,260 @@ namespace EagleConnect.Services
                 var roles = await _context.UserRoles
                     .Where(ur => ur.UserId == user.Id)
                     .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name)
+                    .Where(name => name != null)
+                    .Select(name => name!)
                     .ToListAsync();
                 
                 userRoles[user.Id] = roles;
             }
             
             return userRoles;
+        }
+    }
+
+    public class ConnectionService : IConnectionService
+    {
+        private readonly ApplicationDbContext _context;
+
+        public ConnectionService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<Connection?> GetConnectionAsync(string user1Id, string user2Id)
+        {
+            // Check both directions since connection can be stored as User1-User2 or User2-User1
+            var connection = await _context.Connections
+                .Include(c => c.User1)
+                .Include(c => c.User2)
+                .Include(c => c.Messages.OrderByDescending(m => m.SentAt).Take(1))
+                .FirstOrDefaultAsync(c => 
+                    (c.User1Id == user1Id && c.User2Id == user2Id) ||
+                    (c.User1Id == user2Id && c.User2Id == user1Id));
+            
+            return connection;
+        }
+
+        public async Task<Connection?> GetConnectionByIdAsync(int connectionId)
+        {
+            return await _context.Connections
+                .Include(c => c.User1)
+                .Include(c => c.User2)
+                .Include(c => c.Messages.OrderByDescending(m => m.SentAt))
+                .FirstOrDefaultAsync(c => c.Id == connectionId);
+        }
+
+        public async Task<List<Connection>> GetUserConnectionsAsync(string userId)
+        {
+            var connections = await _context.Connections
+                .Include(c => c.User1)
+                .Include(c => c.User2)
+                .Where(c => (c.User1Id == userId || c.User2Id == userId) && c.Status == ConnectionStatus.Accepted)
+                .ToListAsync();
+
+            // Load last message for each connection
+            foreach (var connection in connections)
+            {
+                var lastMessage = await _context.Messages
+                    .Where(m => m.ConnectionId == connection.Id)
+                    .OrderByDescending(m => m.SentAt)
+                    .FirstOrDefaultAsync();
+                
+                if (lastMessage != null)
+                {
+                    connection.Messages = new List<Message> { lastMessage };
+                }
+            }
+
+            // Order by last message time or accepted time
+            return connections.OrderByDescending(c => 
+                c.Messages.Any() ? c.Messages.Max(m => m.SentAt) : c.AcceptedAt ?? c.CreatedAt).ToList();
+        }
+
+        public async Task<List<Connection>> GetPendingConnectionsAsync(string userId)
+        {
+            return await _context.Connections
+                .Include(c => c.User1)
+                .Include(c => c.User2)
+                .Where(c => (c.User1Id == userId || c.User2Id == userId) && c.Status == ConnectionStatus.Pending)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<Connection> CreateConnectionAsync(string user1Id, string user2Id)
+        {
+            // Check if connection already exists in either direction
+            var existing = await GetConnectionAsync(user1Id, user2Id);
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            // Ensure user1Id < user2Id for consistency
+            if (string.Compare(user1Id, user2Id) > 0)
+            {
+                (user1Id, user2Id) = (user2Id, user1Id);
+            }
+
+            var connection = new Connection
+            {
+                User1Id = user1Id,
+                User2Id = user2Id,
+                Status = ConnectionStatus.Pending,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Connections.Add(connection);
+            await _context.SaveChangesAsync();
+            return connection;
+        }
+
+        public async Task<bool> AcceptConnectionAsync(int connectionId, string userId)
+        {
+            var connection = await _context.Connections.FindAsync(connectionId);
+            if (connection == null) return false;
+
+            // Verify the user is the recipient
+            if (connection.User2Id != userId && connection.User1Id != userId)
+            {
+                return false;
+            }
+
+            connection.Status = ConnectionStatus.Accepted;
+            connection.AcceptedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeclineConnectionAsync(int connectionId, string userId)
+        {
+            var connection = await _context.Connections.FindAsync(connectionId);
+            if (connection == null) return false;
+
+            // Verify the user is the recipient
+            if (connection.User2Id != userId && connection.User1Id != userId)
+            {
+                return false;
+            }
+
+            connection.Status = ConnectionStatus.Declined;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> AreConnectedAsync(string user1Id, string user2Id)
+        {
+            var connection = await GetConnectionAsync(user1Id, user2Id);
+            return connection != null && connection.Status == ConnectionStatus.Accepted;
+        }
+
+        public async Task<bool> DeleteConnectionAsync(int connectionId)
+        {
+            var connection = await _context.Connections.FindAsync(connectionId);
+            if (connection == null) return false;
+
+            _context.Connections.Remove(connection);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+    }
+
+    public class MessageService : IMessageService
+    {
+        private readonly ApplicationDbContext _context;
+
+        public MessageService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<Message> SendMessageAsync(int connectionId, string senderId, string content)
+        {
+            var message = new Message
+            {
+                ConnectionId = connectionId,
+                SenderId = senderId,
+                Content = content,
+                SentAt = DateTime.UtcNow,
+                IsRead = false
+            };
+
+            _context.Messages.Add(message);
+            await _context.SaveChangesAsync();
+
+            // Load sender for SignalR
+            message.Sender = await _context.Users.FindAsync(senderId);
+            return message;
+        }
+
+        public async Task<List<Message>> GetMessagesAsync(int connectionId, int? skip = null, int? take = null)
+        {
+            var query = _context.Messages
+                .Include(m => m.Sender)
+                .Where(m => m.ConnectionId == connectionId)
+                .OrderByDescending(m => m.SentAt);
+
+            if (skip.HasValue)
+            {
+                query = (IOrderedQueryable<Message>)query.Skip(skip.Value);
+            }
+
+            if (take.HasValue)
+            {
+                query = (IOrderedQueryable<Message>)query.Take(take.Value);
+            }
+
+            var messages = await query.ToListAsync();
+            return messages.OrderBy(m => m.SentAt).ToList(); // Reverse to show oldest first
+        }
+
+        public async Task<bool> MarkMessageAsReadAsync(int messageId, string userId)
+        {
+            var message = await _context.Messages
+                .Include(m => m.Connection)
+                .FirstOrDefaultAsync(m => m.Id == messageId);
+
+            if (message == null) return false;
+
+            // Verify the user is part of the connection
+            if (message.Connection?.User1Id != userId && message.Connection?.User2Id != userId)
+            {
+                return false;
+            }
+
+            // Only mark as read if the user is not the sender
+            if (message.SenderId != userId && !message.IsRead)
+            {
+                message.IsRead = true;
+                message.ReadAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
+        public async Task<int> GetUnreadMessageCountAsync(string userId)
+        {
+            return await _context.Messages
+                .Include(m => m.Connection)
+                .Where(m => 
+                    !m.IsRead &&
+                    m.SenderId != userId &&
+                    (m.Connection!.User1Id == userId || m.Connection.User2Id == userId))
+                .CountAsync();
+        }
+
+        public async Task<List<Message>> GetUnreadMessagesAsync(string userId)
+        {
+            return await _context.Messages
+                .Include(m => m.Connection)
+                .Include(m => m.Sender)
+                .Where(m => 
+                    !m.IsRead &&
+                    m.SenderId != userId &&
+                    (m.Connection!.User1Id == userId || m.Connection.User2Id == userId))
+                .OrderByDescending(m => m.SentAt)
+                .ToListAsync();
         }
     }
 }

@@ -100,7 +100,30 @@
                                     </div>
                                     
                                     <div class="d-flex gap-2">
-                                        <a href="mailto:@post.ContactInfo" class="btn btn-primary btn-sm">Contact</a>
+                                        @if (Model.CurrentUser != null && post.PosterId != Model.CurrentUser.Id)
+                                        {
+                                            var isConnected = Model.ConnectionStatuses.ContainsKey(post.PosterId) && Model.ConnectionStatuses[post.PosterId];
+                                            var connection = await Model.GetConnectionIdAsync(post.PosterId);
+                                            @if (isConnected && connection.HasValue)
+                                            {
+                                                <a asp-page="/Connections" asp-route-connectionId="@connection.Value" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-comments"></i> Chat
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <form method="post" asp-page="/Connections" asp-page-handler="Connect" class="d-inline">
+                                                    <input type="hidden" name="userId" value="@post.PosterId" />
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-user-plus"></i> Connect
+                                                    </button>
+                                                </form>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <a href="mailto:@post.ContactInfo" class="btn btn-primary btn-sm">Contact</a>
+                                        }
                                         <button class="btn btn-outline-secondary btn-sm" disabled>Save</button>
                                     </div>
                                 </div>

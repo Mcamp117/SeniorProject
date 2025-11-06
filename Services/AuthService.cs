@@ -20,7 +20,7 @@ namespace EagleConnect.Services
             _context = context;
         }
 
-        public async Task<IdentityResult> RegisterAsync(string email, string password, string firstName, string lastName, UserType userType)
+        public async Task<IdentityResult> RegisterAsync(string email, string password, string firstName, string lastName, UserType userType, int? graduationYear = null)
         {
             var user = new ApplicationUser
             {
@@ -29,6 +29,7 @@ namespace EagleConnect.Services
                 FirstName = firstName,
                 LastName = lastName,
                 Type = userType,
+                GraduationYear = graduationYear ?? 0,
                 CreatedAt = DateTime.UtcNow
             };
 

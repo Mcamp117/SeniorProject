@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using EagleConnect.Data;
 using EagleConnect.Models;
 using EagleConnect.Services;
+using EagleConnect.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,12 +48,17 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+// Add SignalR
+builder.Services.AddSignalR();
+
 // Add custom services
 builder.Services.AddScoped<ISkillService, SkillService>();
 builder.Services.AddScoped<IStudentOrganizationService, StudentOrganizationService>();
 builder.Services.AddScoped<IRelationshipService, RelationshipService>();
 builder.Services.AddScoped<IConnectionPostService, ConnectionPostService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IConnectionService, ConnectionService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 
 // Add authentication services
 builder.Services.AddAuthentication()
@@ -99,6 +105,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapHub<ChatHub>("/chathub");
 
 // Redirect root to home page
 app.MapGet("/", (HttpContext context) =>

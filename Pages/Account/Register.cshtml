@@ -49,13 +49,20 @@
 
                         <div class="mb-3">
                             <label asp-for="Input.UserType" class="form-label">User Type</label>
-                            <select asp-for="Input.UserType" class="form-select">
+                            <select asp-for="Input.UserType" class="form-select" id="userTypeSelect">
                                 <option value="Student">Student</option>
                                 <option value="Alumni">Alumni</option>
                                 <option value="Faculty">Faculty</option>
                                 <option value="External">External</option>
                             </select>
                             <span asp-validation-for="Input.UserType" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3" id="graduationYearGroup">
+                            <label asp-for="Input.GraduationYear" class="form-label">Graduation Year</label>
+                            <input asp-for="Input.GraduationYear" class="form-control" type="number" min="1900" max="@(DateTime.Now.Year + 10)" />
+                            <span asp-validation-for="Input.GraduationYear" class="text-danger"></span>
+                            <small class="form-text text-muted">Required for Alumni</small>
                         </div>
 
                         <div class="d-grid">
@@ -73,4 +80,28 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userTypeSelect = document.getElementById('userTypeSelect');
+            const graduationYearGroup = document.getElementById('graduationYearGroup');
+            const graduationYearInput = document.querySelector('input[name="Input.GraduationYear"]');
+            
+            function toggleGraduationYear() {
+                if (userTypeSelect.value === 'Alumni') {
+                    graduationYearGroup.style.display = 'block';
+                    graduationYearInput.setAttribute('required', 'required');
+                } else {
+                    graduationYearGroup.style.display = 'none';
+                    graduationYearInput.removeAttribute('required');
+                    graduationYearInput.value = '';
+                }
+            }
+            
+            // Initial state
+            toggleGraduationYear();
+            
+            // Listen for changes
+            userTypeSelect.addEventListener('change', toggleGraduationYear);
+        });
+    </script>
 }

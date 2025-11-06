@@ -18,6 +18,8 @@ namespace EagleConnect.Data
         public DbSet<StudentOrganizationMember> StudentOrganizationMembers { get; set; }
         public DbSet<Relationship> Relationships { get; set; }
         public DbSet<ConnectionPost> ConnectionPosts { get; set; }
+        public DbSet<Connection> Connections { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -131,6 +133,53 @@ namespace EagleConnect.Data
                     .WithMany(u => u.ConnectionPosts)
                     .HasForeignKey(e => e.PosterId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configure Connection
+            builder.Entity<Connection>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.User1Id).IsRequired();
+                entity.Property(e => e.User2Id).IsRequired();
+                entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
+                
+                entity.HasOne(e => e.User1)
+                    .WithMany()
+                    .HasForeignKey(e => e.User1Id)
+                    .OnDelete(DeleteBehavior.Restrict);
+                    
+                entity.HasOne(e => e.User2)
+                    .WithMany()
+                    .HasForeignKey(e => e.User2Id)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
+                // Prevent duplicate connections
+                entity.HasIndex(e => new { e.User1Id, e.User2Id }).IsUnique();
+                
+                // Prevent self-connections
+                entity.ToTable(t => t.HasCheckConstraint("CK_Connection_DifferentUsers", "User1Id != User2Id"));
+            });
+
+            // Configure Message
+            builder.Entity<Message>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.ConnectionId).IsRequired();
+                entity.Property(e => e.SenderId).IsRequired();
+                entity.Property(e => e.Content).IsRequired().HasMaxLength(2000);
+                
+                entity.HasOne(e => e.Connection)
+                    .WithMany(c => c.Messages)
+                    .HasForeignKey(e => e.ConnectionId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                    
+                entity.HasOne(e => e.Sender)
+                    .WithMany()
+                    .HasForeignKey(e => e.SenderId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                    
+                entity.HasIndex(e => e.ConnectionId);
+                entity.HasIndex(e => e.SentAt);
             });
 
             // Seed initial data

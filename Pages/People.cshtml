@@ -94,7 +94,14 @@
                                     }
                                     else if (user.Type == EagleConnect.Models.UserType.Alumni)
                                     {
-                                        <span class="badge bg-success">Alumni '@user.GraduationYear</span>
+                                        @if (user.GraduationYear > 0)
+                                        {
+                                            <span class="badge bg-success">Alumni '@user.GraduationYear</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">Alumni</span>
+                                        }
                                     }
                                     else if (user.Type == EagleConnect.Models.UserType.Faculty)
                                     {
@@ -142,7 +149,26 @@
                         
                         <div class="d-flex gap-2">
                             <a href="mailto:@user.Email" class="btn btn-primary btn-sm">Contact</a>
-                            <button class="btn btn-outline-secondary btn-sm" disabled>Connect</button>
+                            @if (Model.CurrentUser != null && user.Id != Model.CurrentUser.Id)
+                            {
+                                var isConnected = Model.ConnectionStatuses.ContainsKey(user.Id) && Model.ConnectionStatuses[user.Id];
+                                var connection = await Model.GetConnectionIdAsync(user.Id);
+                                @if (isConnected && connection.HasValue)
+                                {
+                                    <a asp-page="/Connections" asp-route-connectionId="@connection.Value" class="btn btn-success btn-sm">
+                                        <i class="fas fa-comments"></i> Chat
+                                    </a>
+                                }
+                                else
+                                {
+                                    <form method="post" asp-page="/Connections" asp-page-handler="Connect" class="d-inline">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-user-plus"></i> Connect
+                                        </button>
+                                    </form>
+                                }
+                            }
                         </div>
                     </div>
                 </div>

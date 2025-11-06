@@ -47,6 +47,9 @@ namespace EagleConnect.Pages.Account
             [Required]
             [Display(Name = "User Type")]
             public UserType UserType { get; set; }
+
+            [Display(Name = "Graduation Year")]
+            public int? GraduationYear { get; set; }
         }
 
         public void OnGet()
@@ -55,6 +58,12 @@ namespace EagleConnect.Pages.Account
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Validate graduation year for Alumni
+            if (Input.UserType == UserType.Alumni && (!Input.GraduationYear.HasValue || Input.GraduationYear.Value <= 0))
+            {
+                ModelState.AddModelError("Input.GraduationYear", "Graduation Year is required for Alumni.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -65,7 +74,8 @@ namespace EagleConnect.Pages.Account
                 Input.Password,
                 Input.FirstName,
                 Input.LastName,
-                Input.UserType
+                Input.UserType,
+                Input.GraduationYear
             );
 
             if (result.Succeeded)

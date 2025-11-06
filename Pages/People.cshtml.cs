@@ -11,11 +11,19 @@ public class PeopleModel : PageModel
 {
     private readonly IUserService _userService;
     private readonly ISkillService _skillService;
+    private readonly AuthService _authService;
+    private readonly IConnectionService _connectionService;
 
-    public PeopleModel(IUserService userService, ISkillService skillService)
+    public PeopleModel(
+        IUserService userService, 
+        ISkillService skillService,
+        AuthService authService,
+        IConnectionService connectionService)
     {
         _userService = userService;
         _skillService = skillService;
+        _authService = authService;
+        _connectionService = connectionService;
     }
 
     public List<ApplicationUser> AllUsers { get; set; } = new List<ApplicationUser>();
@@ -24,6 +32,8 @@ public class PeopleModel : PageModel
     public string SelectedType { get; set; } = string.Empty;
     public string SelectedSkill { get; set; } = string.Empty;
     public List<Skill> AvailableSkills { get; set; } = new List<Skill>();
+    public ApplicationUser? CurrentUser { get; set; }
+    public Dictionary<string, bool> ConnectionStatuses { get; set; } = new();
 
     public async Task OnGetAsync(string search, string type, string skill)
     {
@@ -66,5 +76,29 @@ public class PeopleModel : PageModel
         }
 
         FilteredUsers = query.ToList();
+
+        // Get current user and check connection statuses
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            CurrentUser = await _authService.GetCurrentUserAsync(User);
+            
+            if (CurrentUser != null)
+            {
+                foreach (var user in FilteredUsers)
+                {
+                    if (user.Id != CurrentUser.Id)
+                    {
+                        ConnectionStatuses[user.Id] = await _connectionService.AreConnectedAsync(CurrentUser.Id, user.Id);
+                    }
+                }
+            }
+        }
+    }
+
+    public async Task<int?> GetConnectionIdAsync(string otherUserId)
+    {
+        if (CurrentUser == null) return null;
+        var connection = await _connectionService.GetConnectionAsync(CurrentUser.Id, otherUserId);
+        return connection?.Id;
     }
 }

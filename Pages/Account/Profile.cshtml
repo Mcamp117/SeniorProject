@@ -1,4 +1,5 @@
 @page
+@using EagleConnect.Models
 @model EagleConnect.Pages.Account.ProfileModel
 @{
     ViewData["Title"] = "Profile";
@@ -54,6 +55,13 @@
                                     </div>
                                 }
 
+                                @if (Model.CurrentUser.Type == UserType.Alumni && Model.CurrentUser.GraduationYear > 0)
+                                {
+                                    <div class="mb-3">
+                                        <strong>Graduation Year:</strong> @Model.CurrentUser.GraduationYear
+                                    </div>
+                                }
+
                                 @if (!string.IsNullOrEmpty(Model.CurrentUser.Company))
                                 {
                                     <div class="mb-3">
@@ -102,10 +110,11 @@
                 </div>
                 <div class="card-footer">
                     <div class="d-flex gap-2">
-                        <button class="btn btn-primary" disabled>Edit Profile</button>
+                        <a asp-page="/Account/EditProfile" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </a>
                         <button class="btn btn-outline-secondary" disabled>Change Password</button>
                     </div>
-                    <small class="text-muted">Profile editing features coming soon!</small>
                 </div>
             </div>
         </div>

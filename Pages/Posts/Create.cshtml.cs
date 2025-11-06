@@ -21,21 +21,55 @@ public class CreateModel : PageModel
     [BindProperty]
     public ConnectionPost Post { get; set; } = new ConnectionPost();
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(string? type = null)
     {
+        // Get current user to set as poster
+        var currentUser = await _userService.GetUserByEmailAsync(User.Identity?.Name ?? "");
+        if (currentUser == null)
+        {
+            return RedirectToPage("/Account/Login");
+        }
+
         Post.PostedDate = DateTime.UtcNow;
         Post.Status = PostStatus.Active;
         
-        // Get current user to set as poster
-        var currentUser = await _userService.GetUserByEmailAsync(User.Identity?.Name ?? "");
-        if (currentUser != null)
+        // Pre-fill type if provided
+        if (!string.IsNullOrEmpty(type) && Enum.TryParse<ConnectionType>(type, out var connectionType))
         {
-            Post.PosterId = currentUser.Id;
+            // Alumni, Faculty, and External can create mentorship posts
+            if (connectionType == ConnectionType.Mentorship && 
+                currentUser.Type != UserType.Alumni && 
+                currentUser.Type != UserType.Faculty && 
+                currentUser.Type != UserType.External)
+            {
+                return RedirectToPage("/Alumni/Mentorship");
+            }
+            Post.Type = connectionType;
         }
+        
+        Post.PosterId = currentUser.Id;
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        // Get current user
+        var currentUser = await _userService.GetUserByEmailAsync(User.Identity?.Name ?? "");
+        if (currentUser == null)
+        {
+            return RedirectToPage("/Account/Login");
+        }
+
+        // Only Alumni, Faculty, and External can create mentorship posts
+        if (Post.Type == ConnectionType.Mentorship && 
+            currentUser.Type != UserType.Alumni && 
+            currentUser.Type != UserType.Faculty && 
+            currentUser.Type != UserType.External)
+        {
+            ModelState.AddModelError("", "Only Alumni, Faculty, and External mentors can create mentorship posts.");
+            return Page();
+        }
+
         if (!ModelState.IsValid)
         {
             return Page();
@@ -44,7 +78,13 @@ public class CreateModel : PageModel
         // Verify the PosterId is set (it should be from OnGetAsync)
         if (string.IsNullOrEmpty(Post.PosterId))
         {
-            ModelState.AddModelError("", "Unable to identify current user. Please try again.");
+            Post.PosterId = currentUser.Id;
+        }
+        
+        // Ensure the poster is the current user
+        if (Post.PosterId != currentUser.Id)
+        {
+            ModelState.AddModelError("", "You can only create posts for yourself.");
             return Page();
         }
 
@@ -56,6 +96,21 @@ public class CreateModel : PageModel
             var createdPost = await _postService.CreateConnectionPostAsync(Post);
             // Log success for debugging
             Console.WriteLine($"Post created successfully with ID: {createdPost.Id}");
+            
+            // Redirect based on post type and poster type
+            if (createdPost.Type == ConnectionType.Mentorship)
+            {
+                if (currentUser.Type == UserType.Alumni)
+                {
+                    return Redirect("/Alumni/Mentorship");
+                }
+                else if (currentUser.Type == UserType.External)
+                {
+                    return Redirect("/External");
+                }
+                // Faculty can go to Posts page
+                return Redirect("/Posts");
+            }
             return Redirect("/home");
         }
         catch (Exception ex)
@@ -67,3 +122,4 @@ public class CreateModel : PageModel
         }
     }
 }
+

@@ -1,0 +1,119 @@
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
+using EagleConnect.Services;
+using EagleConnect.Models;
+
+namespace EagleConnect.Hubs
+{
+    [Authorize]
+    public class ChatHub : Hub
+    {
+        private readonly IMessageService _messageService;
+        private readonly IConnectionService _connectionService;
+
+        public ChatHub(IMessageService messageService, IConnectionService connectionService)
+        {
+            _messageService = messageService;
+            _connectionService = connectionService;
+        }
+
+        public async Task SendMessage(int connectionId, string content)
+        {
+            var userId = Context.UserIdentifier;
+            if (string.IsNullOrEmpty(userId))
+            {
+                await Clients.Caller.SendAsync("Error", "User not authenticated");
+                return;
+            }
+
+            // Verify connection exists and user is part of it
+            var connection = await _connectionService.GetConnectionByIdAsync(connectionId);
+            if (connection == null || (connection.User1Id != userId && connection.User2Id != userId))
+            {
+                await Clients.Caller.SendAsync("Error", "Connection not found or unauthorized");
+                return;
+            }
+
+            // Save message to database
+            var message = await _messageService.SendMessageAsync(connectionId, userId, content);
+
+            // Get the other user's ID
+            var otherUserId = connection.User1Id == userId ? connection.User2Id : connection.User1Id;
+
+            // Send to both users
+            await Clients.User(userId).SendAsync("ReceiveMessage", new
+            {
+                id = message.Id,
+                connectionId = message.ConnectionId,
+                senderId = message.SenderId,
+                senderName = message.Sender?.FirstName + " " + message.Sender?.LastName,
+                content = message.Content,
+                sentAt = message.SentAt,
+                isRead = message.IsRead
+            });
+
+            await Clients.User(otherUserId).SendAsync("ReceiveMessage", new
+            {
+                id = message.Id,
+                connectionId = message.ConnectionId,
+                senderId = message.SenderId,
+                senderName = message.Sender?.FirstName + " " + message.Sender?.LastName,
+                content = message.Content,
+                sentAt = message.SentAt,
+                isRead = message.IsRead
+            });
+
+            // Notify other user of new message
+            await Clients.User(otherUserId).SendAsync("NewMessageNotification", connectionId);
+        }
+
+        public async Task JoinConnection(int connectionId)
+        {
+            var userId = Context.UserIdentifier;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return;
+            }
+
+            // Verify connection exists and user is part of it
+            var connection = await _connectionService.GetConnectionByIdAsync(connectionId);
+            if (connection != null && (connection.User1Id == userId || connection.User2Id == userId))
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, $"connection_{connectionId}");
+                
+                // Mark messages as read
+                var messages = await _messageService.GetMessagesAsync(connectionId);
+                foreach (var message in messages.Where(m => m.SenderId != userId && !m.IsRead))
+                {
+                    await _messageService.MarkMessageAsReadAsync(message.Id, userId);
+                }
+            }
+        }
+
+        public async Task LeaveConnection(int connectionId)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"connection_{connectionId}");
+        }
+
+        public override async Task OnConnectedAsync()
+        {
+            var userId = Context.UserIdentifier;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
+            }
+            await base.OnConnectedAsync();
+        }
+
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            var userId = Context.UserIdentifier;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user_{userId}");
+            }
+            await base.OnDisconnectedAsync(exception);
+        }
+    }
+}
+

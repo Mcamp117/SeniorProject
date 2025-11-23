@@ -65,7 +65,6 @@ public class EditModel : PageModel
         }
 
         // Remove validation errors for optional fields - they can be empty
-        ModelState.Remove("UserModel.Year");
         ModelState.Remove("UserModel.Bio");
         ModelState.Remove("UserModel.Company");
         ModelState.Remove("UserModel.JobTitle");

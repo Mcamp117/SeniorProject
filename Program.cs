@@ -40,7 +40,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.User.RequireUniqueEmail = true;
 
     // Sign-in settings
-    options.SignIn.RequireConfirmedEmail = false; // Set to true when email verification is implemented
+    options.SignIn.RequireConfirmedEmail = false; // Email verification is optional
     options.SignIn.RequireConfirmedPhoneNumber = false;
 
 
@@ -83,6 +83,8 @@ builder.Services.AddAuthorization(options =>
 
 // Add custom services
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

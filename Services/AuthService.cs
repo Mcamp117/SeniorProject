@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using EagleConnect.Models;
 using EagleConnect.Data;
+using EagleConnect.Services;
 
 namespace EagleConnect.Services
 {
@@ -20,7 +21,15 @@ namespace EagleConnect.Services
             _context = context;
         }
 
-        public async Task<IdentityResult> RegisterAsync(string email, string password, string firstName, string lastName, UserType userType, int? graduationYear = null)
+        public async Task<IdentityResult> RegisterAsync(
+            string email, 
+            string password, 
+            string firstName, 
+            string lastName, 
+            UserType userType, 
+            int? graduationYear = null,
+            string? company = null,
+            string? jobTitle = null)
         {
             var user = new ApplicationUser
             {
@@ -30,16 +39,20 @@ namespace EagleConnect.Services
                 LastName = lastName,
                 Type = userType,
                 GraduationYear = graduationYear ?? 0,
-                CreatedAt = DateTime.UtcNow
+                Company = company ?? string.Empty,
+                JobTitle = jobTitle ?? string.Empty,
+                CreatedAt = DateTime.UtcNow,
+                IsApproved = false // Require admin approval
             };
 
             var result = await _userManager.CreateAsync(user, password);
             
             if (result.Succeeded)
             {
-                // Update last login time
-                user.LastLoginAt = DateTime.UtcNow;
-                await _userManager.UpdateAsync(user);
+                // Generate email confirmation token
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                // Store token in TempData for email service to use
+                // Email confirmation will be handled by email service
             }
 
             return result;
@@ -51,6 +64,12 @@ namespace EagleConnect.Services
             if (user == null)
             {
                 return SignInResult.Failed;
+            }
+
+            // Check if user is approved
+            if (!user.IsApproved)
+            {
+                return SignInResult.NotAllowed; // Use NotAllowed to indicate approval needed
             }
 
             var result = await _signInManager.PasswordSignInAsync(user, password, rememberMe, lockoutOnFailure: false);

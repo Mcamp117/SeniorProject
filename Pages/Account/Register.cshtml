@@ -1,72 +1,155 @@
 @page
 @model EagleConnect.Pages.Account.RegisterModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Create Account";
     Layout = "~/Pages/Shared/_PublicLayout.cshtml";
 }
 
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white text-center">
-                    <h3>Create Account</h3>
+                    <h3>Create Your Account</h3>
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-center">
+                            <div class="step-indicator @(Model.CurrentStep == 1 ? "active" : "")">
+                                <span class="step-number">1</span>
+                                <span class="step-label">Basic Info</span>
+                            </div>
+                            <div class="step-line @(Model.CurrentStep == 2 ? "active" : "")"></div>
+                            <div class="step-indicator @(Model.CurrentStep == 2 ? "active" : "")">
+                                <span class="step-number">2</span>
+                                <span class="step-label">Complete Profile</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" id="registerForm">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                         
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Input.FirstName" class="form-label">First Name</label>
-                                <input asp-for="Input.FirstName" class="form-control" />
-                                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                        @* Step 1: Basic Information *@
+                        <div id="step1" style="display: @(Model.CurrentStep == 1 ? "block" : "none");">
+                            <h5 class="mb-4">Let's get started</h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Input.FirstName" class="form-label">First Name</label>
+                                    <input asp-for="Input.FirstName" class="form-control" />
+                                    <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Input.LastName" class="form-label">Last Name</label>
+                                    <input asp-for="Input.LastName" class="form-control" />
+                                    <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Input.LastName" class="form-label">Last Name</label>
-                                <input asp-for="Input.LastName" class="form-control" />
-                                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.Email" class="form-label">Email</label>
+                                <input asp-for="Input.Email" class="form-control" type="email" />
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Input.Password" class="form-label">Password</label>
+                                    <input asp-for="Input.Password" class="form-control" type="password" />
+                                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Input.ConfirmPassword" class="form-label">Confirm Password</label>
+                                    <input asp-for="Input.ConfirmPassword" class="form-control" type="password" />
+                                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.UserType" class="form-label">I am a</label>
+                                <select asp-for="Input.UserType" class="form-select" id="userTypeSelect">
+                                    <option value="Student">Student</option>
+                                    <option value="Alumni">Alumni</option>
+                                    <option value="Faculty">Faculty</option>
+                                    <option value="External">External Mentor</option>
+                                </select>
+                                <span asp-validation-for="Input.UserType" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" name="action" value="next" class="btn btn-primary">Continue</button>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Input.Email" class="form-label">Email</label>
-                            <input asp-for="Input.Email" class="form-control" />
-                            <span asp-validation-for="Input.Email" class="text-danger"></span>
-                        </div>
+                        @* Step 2: Type-Specific Information *@
+                        <div id="step2" style="display: @(Model.CurrentStep == 2 ? "block" : "none");">
+                            <h5 class="mb-4">Complete your profile</h5>
+                            
+                            @* Alumni Fields *@
+                            <div id="alumniFields" style="display: none;">
+                                <div class="mb-3">
+                                    <label asp-for="Input.GraduationYear" class="form-label">Graduation Year <span class="text-danger">*</span></label>
+                                    <input asp-for="Input.GraduationYear" class="form-control" type="number" min="1900" max="@(DateTime.Now.Year + 10)" />
+                                    <span asp-validation-for="Input.GraduationYear" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Input.Company" class="form-label">Company</label>
+                                        <input asp-for="Input.Company" class="form-control" />
+                                        <span asp-validation-for="Input.Company" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Input.JobTitle" class="form-label">Job Title</label>
+                                        <input asp-for="Input.JobTitle" class="form-control" />
+                                        <span asp-validation-for="Input.JobTitle" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Input.Password" class="form-label">Password</label>
-                            <input asp-for="Input.Password" class="form-control" />
-                            <span asp-validation-for="Input.Password" class="text-danger"></span>
-                        </div>
+                            @* Student Fields *@
+                            <div id="studentFields" style="display: none;">
+                                <p class="text-muted">You can add more details to your profile after registration.</p>
+                            </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Input.ConfirmPassword" class="form-label">Confirm Password</label>
-                            <input asp-for="Input.ConfirmPassword" class="form-control" />
-                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-                        </div>
+                            @* Faculty Fields *@
+                            <div id="facultyFields" style="display: none;">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> Your company is automatically set to <strong>USI</strong>.
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Department</label>
+                                        <input type="text" class="form-control" value="USI" disabled />
+                                        <small class="text-muted">Automatically set to USI</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Input.JobTitle" class="form-label">Title</label>
+                                        <input asp-for="Input.JobTitle" class="form-control" placeholder="e.g., Professor, Associate Professor" />
+                                        <span asp-validation-for="Input.JobTitle" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Input.UserType" class="form-label">User Type</label>
-                            <select asp-for="Input.UserType" class="form-select" id="userTypeSelect">
-                                <option value="Student">Student</option>
-                                <option value="Alumni">Alumni</option>
-                                <option value="Faculty">Faculty</option>
-                                <option value="External">External</option>
-                            </select>
-                            <span asp-validation-for="Input.UserType" class="text-danger"></span>
-                        </div>
+                            @* External Fields *@
+                            <div id="externalFields" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Input.Company" class="form-label">Company</label>
+                                        <input asp-for="Input.Company" class="form-control" />
+                                        <span asp-validation-for="Input.Company" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Input.JobTitle" class="form-label">Job Title</label>
+                                        <input asp-for="Input.JobTitle" class="form-control" />
+                                        <span asp-validation-for="Input.JobTitle" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div class="mb-3" id="graduationYearGroup">
-                            <label asp-for="Input.GraduationYear" class="form-label">Graduation Year</label>
-                            <input asp-for="Input.GraduationYear" class="form-control" type="number" min="1900" max="@(DateTime.Now.Year + 10)" />
-                            <span asp-validation-for="Input.GraduationYear" class="text-danger"></span>
-                            <small class="form-text text-muted">Required for Alumni</small>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Register</button>
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary" onclick="goToStep(1)">Back</button>
+                                <button type="submit" name="action" value="" class="btn btn-primary">Create Account</button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -78,30 +161,128 @@
     </div>
 </div>
 
+<style>
+    .step-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .step-indicator.active .step-number {
+        background-color: #fff;
+        color: #0d6efd;
+        border: 2px solid #0d6efd;
+    }
+    .step-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    .step-indicator.active .step-label {
+        color: #fff;
+    }
+    .step-line {
+        width: 100px;
+        height: 2px;
+        background-color: #e9ecef;
+        margin: 0 10px;
+        margin-top: 20px;
+    }
+    .step-line.active {
+        background-color: #fff;
+    }
+</style>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const userTypeSelect = document.getElementById('userTypeSelect');
-            const graduationYearGroup = document.getElementById('graduationYearGroup');
-            const graduationYearInput = document.querySelector('input[name="Input.GraduationYear"]');
+            const userType = '@Model.Input.UserType';
             
-            function toggleGraduationYear() {
-                if (userTypeSelect.value === 'Alumni') {
-                    graduationYearGroup.style.display = 'block';
-                    graduationYearInput.setAttribute('required', 'required');
-                } else {
-                    graduationYearGroup.style.display = 'none';
-                    graduationYearInput.removeAttribute('required');
-                    graduationYearInput.value = '';
+            // Set the select value if we're on step 2
+            if (userType) {
+                userTypeSelect.value = userType;
+            }
+            
+            function showFieldsForUserType() {
+                const selectedType = userTypeSelect.value;
+                
+                // Hide all fields
+                document.getElementById('alumniFields').style.display = 'none';
+                document.getElementById('studentFields').style.display = 'none';
+                document.getElementById('facultyFields').style.display = 'none';
+                document.getElementById('externalFields').style.display = 'none';
+                
+                // Show relevant fields
+                switch(selectedType) {
+                    case 'Alumni':
+                        document.getElementById('alumniFields').style.display = 'block';
+                        break;
+                    case 'Student':
+                        document.getElementById('studentFields').style.display = 'block';
+                        break;
+                    case 'Faculty':
+                        document.getElementById('facultyFields').style.display = 'block';
+                        break;
+                    case 'External':
+                        document.getElementById('externalFields').style.display = 'block';
+                        break;
                 }
             }
             
-            // Initial state
-            toggleGraduationYear();
+            // Initial state - always show fields if on step 2
+            if (@Model.CurrentStep == 2) {
+                // Ensure userType is set, default to Student if empty
+                if (!userType || userType === '') {
+                    userTypeSelect.value = 'Student';
+                }
+                showFieldsForUserType();
+            }
             
             // Listen for changes
-            userTypeSelect.addEventListener('change', toggleGraduationYear);
+            userTypeSelect.addEventListener('change', showFieldsForUserType);
         });
+        
+        function goToStep(step) {
+            // Create a form to preserve data and navigate
+            const form = document.getElementById('registerForm');
+            const backForm = document.createElement('form');
+            backForm.method = 'get';
+            backForm.action = window.location.pathname;
+            
+            // Add step parameter
+            const stepInput = document.createElement('input');
+            stepInput.type = 'hidden';
+            stepInput.name = 'step';
+            stepInput.value = step;
+            backForm.appendChild(stepInput);
+            
+            // Copy form values as query parameters (except passwords for security)
+            const inputs = form.querySelectorAll('input:not([type="password"]), select');
+            inputs.forEach(inp => {
+                if (inp.name && inp.name.startsWith('Input.') && inp.value) {
+                    const hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = inp.name;
+                    hidden.value = inp.value;
+                    backForm.appendChild(hidden);
+                }
+            });
+            
+            document.body.appendChild(backForm);
+            backForm.submit();
+        }
     </script>
 }

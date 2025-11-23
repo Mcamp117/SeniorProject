@@ -30,7 +30,6 @@ namespace EagleConnect.Data
             {
                 entity.Property(e => e.FirstName).HasMaxLength(50);
                 entity.Property(e => e.LastName).HasMaxLength(50);
-                entity.Property(e => e.Year).HasMaxLength(20);
                 entity.Property(e => e.Bio).HasMaxLength(500);
                 entity.Property(e => e.ProfileImage).HasMaxLength(255).HasDefaultValue("/images/default-avatar.svg");
                 entity.Property(e => e.Company).HasMaxLength(100);
@@ -141,6 +140,7 @@ namespace EagleConnect.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.User1Id).IsRequired();
                 entity.Property(e => e.User2Id).IsRequired();
+                entity.Property(e => e.RequestedById).IsRequired();
                 entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
                 
                 entity.HasOne(e => e.User1)
@@ -153,7 +153,12 @@ namespace EagleConnect.Data
                     .HasForeignKey(e => e.User2Id)
                     .OnDelete(DeleteBehavior.Restrict);
                 
-                // Prevent duplicate connections
+                entity.HasOne(e => e.RequestedBy)
+                    .WithMany()
+                    .HasForeignKey(e => e.RequestedById)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
+                // Prevent duplicate connections (check both directions)
                 entity.HasIndex(e => new { e.User1Id, e.User2Id }).IsUnique();
                 
                 // Prevent self-connections

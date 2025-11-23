@@ -78,7 +78,7 @@ namespace EagleConnect.Services
         Task<Connection?> GetConnectionByIdAsync(int connectionId);
         Task<List<Connection>> GetUserConnectionsAsync(string userId);
         Task<List<Connection>> GetPendingConnectionsAsync(string userId);
-        Task<Connection> CreateConnectionAsync(string user1Id, string user2Id);
+        Task<Connection> CreateConnectionAsync(string requesterId, string recipientId);
         Task<bool> AcceptConnectionAsync(int connectionId, string userId);
         Task<bool> DeclineConnectionAsync(int connectionId, string userId);
         Task<bool> AreConnectedAsync(string user1Id, string user2Id);
@@ -541,7 +541,6 @@ namespace EagleConnect.Services
             existingUser.GraduationYear = user.GraduationYear;
             
             // Update optional properties - use empty string if null/whitespace to avoid database null constraint errors
-            existingUser.Year = string.IsNullOrWhiteSpace(user.Year) ? string.Empty : user.Year;
             existingUser.Bio = string.IsNullOrWhiteSpace(user.Bio) ? string.Empty : user.Bio;
             existingUser.Company = string.IsNullOrWhiteSpace(user.Company) ? string.Empty : user.Company;
             existingUser.JobTitle = string.IsNullOrWhiteSpace(user.JobTitle) ? string.Empty : user.JobTitle;
@@ -646,6 +645,7 @@ namespace EagleConnect.Services
             var connection = await _context.Connections
                 .Include(c => c.User1)
                 .Include(c => c.User2)
+                .Include(c => c.RequestedBy)
                 .Include(c => c.Messages.OrderByDescending(m => m.SentAt).Take(1))
                 .FirstOrDefaultAsync(c => 
                     (c.User1Id == user1Id && c.User2Id == user2Id) ||
@@ -659,6 +659,7 @@ namespace EagleConnect.Services
             return await _context.Connections
                 .Include(c => c.User1)
                 .Include(c => c.User2)
+                .Include(c => c.RequestedBy)
                 .Include(c => c.Messages.OrderByDescending(m => m.SentAt))
                 .FirstOrDefaultAsync(c => c.Id == connectionId);
         }
@@ -668,6 +669,7 @@ namespace EagleConnect.Services
             var connections = await _context.Connections
                 .Include(c => c.User1)
                 .Include(c => c.User2)
+                .Include(c => c.RequestedBy)
                 .Where(c => (c.User1Id == userId || c.User2Id == userId) && c.Status == ConnectionStatus.Accepted)
                 .ToListAsync();
 
@@ -692,33 +694,45 @@ namespace EagleConnect.Services
 
         public async Task<List<Connection>> GetPendingConnectionsAsync(string userId)
         {
+            // Only return connections where the user is the recipient (not the requester)
             return await _context.Connections
                 .Include(c => c.User1)
                 .Include(c => c.User2)
-                .Where(c => (c.User1Id == userId || c.User2Id == userId) && c.Status == ConnectionStatus.Pending)
+                .Include(c => c.RequestedBy)
+                .Where(c => (c.User1Id == userId || c.User2Id == userId) 
+                    && c.Status == ConnectionStatus.Pending
+                    && c.RequestedById != userId) // Exclude connections requested by this user
                 .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
         }
 
-        public async Task<Connection> CreateConnectionAsync(string user1Id, string user2Id)
+        public async Task<Connection> CreateConnectionAsync(string requesterId, string recipientId)
         {
             // Check if connection already exists in either direction
-            var existing = await GetConnectionAsync(user1Id, user2Id);
+            var existing = await GetConnectionAsync(requesterId, recipientId);
             if (existing != null)
             {
                 return existing;
             }
 
-            // Ensure user1Id < user2Id for consistency
-            if (string.Compare(user1Id, user2Id) > 0)
+            // Ensure user1Id < user2Id for consistency (for indexing)
+            string user1Id, user2Id;
+            if (string.Compare(requesterId, recipientId) < 0)
             {
-                (user1Id, user2Id) = (user2Id, user1Id);
+                user1Id = requesterId;
+                user2Id = recipientId;
+            }
+            else
+            {
+                user1Id = recipientId;
+                user2Id = requesterId;
             }
 
             var connection = new Connection
             {
                 User1Id = user1Id,
                 User2Id = user2Id,
+                RequestedById = requesterId, // Track who initiated the request
                 Status = ConnectionStatus.Pending,
                 CreatedAt = DateTime.UtcNow
             };
@@ -733,8 +747,14 @@ namespace EagleConnect.Services
             var connection = await _context.Connections.FindAsync(connectionId);
             if (connection == null) return false;
 
-            // Verify the user is the recipient
+            // Verify the user is part of the connection
             if (connection.User2Id != userId && connection.User1Id != userId)
+            {
+                return false;
+            }
+
+            // Prevent users from accepting their own requests
+            if (connection.RequestedById == userId)
             {
                 return false;
             }

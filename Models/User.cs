@@ -7,7 +7,6 @@ namespace EagleConnect.Models
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public UserType Type { get; set; }
-        public string Year { get; set; } = string.Empty;
         public string Bio { get; set; } = string.Empty;
         public string ProfileImage { get; set; } = "/images/default-avatar.svg";
         public string Company { get; set; } = string.Empty;
@@ -15,6 +14,7 @@ namespace EagleConnect.Models
         public int GraduationYear { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastLoginAt { get; set; }
+        public bool IsApproved { get; set; } = false; // Admin approval required
         
         // Navigation properties
         public ICollection<UserSkill> UserSkills { get; set; } = new List<UserSkill>();
@@ -41,7 +41,6 @@ namespace EagleConnect.Models
         public string Email { get; set; } = string.Empty;
         public UserType Type { get; set; }
         public string Major { get; set; } = string.Empty;
-        public string Year { get; set; } = string.Empty;
         public string Bio { get; set; } = string.Empty;
         public string ProfileImage { get; set; } = string.Empty;
         public List<string> Skills { get; set; } = new List<string>();

@@ -120,6 +120,37 @@ namespace EagleConnect.Pages
 
             return RedirectToPage();
         }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int connectionId)
+        {
+            CurrentUser = await _authService.GetCurrentUserAsync(User);
+            if (CurrentUser == null)
+            {
+                return RedirectToPage("/Account/Login");
+            }
+
+            try
+            {
+                // Verify the user is part of the connection before deleting
+                var connection = await _connectionService.GetConnectionByIdAsync(connectionId);
+                if (connection != null && 
+                    (connection.User1Id == CurrentUser.Id || connection.User2Id == CurrentUser.Id))
+                {
+                    await _connectionService.DeleteConnectionAsync(connectionId);
+                    TempData["SuccessMessage"] = "Connection deleted.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "You don't have permission to delete this connection.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error deleting connection: {ex.Message}";
+            }
+
+            return RedirectToPage();
+        }
     }
 }
 

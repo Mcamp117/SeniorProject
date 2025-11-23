@@ -3,6 +3,7 @@ using System;
 using EagleConnect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EagleConnect.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251109232806_RemoveYearField")]
+    partial class RemoveYearField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -359,7 +362,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 1,
                             Category = 0,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8619),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2736),
                             Description = "Core computer science knowledge",
                             Name = "Computer Science"
                         },
@@ -367,7 +370,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 2,
                             Category = 0,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8629),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2751),
                             Description = "Business management and administration",
                             Name = "Business Administration"
                         },
@@ -375,7 +378,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 3,
                             Category = 0,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8631),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2754),
                             Description = "Healthcare and patient care",
                             Name = "Nursing"
                         },
@@ -383,7 +386,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 4,
                             Category = 0,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8633),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2756),
                             Description = "Engineering principles and practices",
                             Name = "Engineering"
                         },
@@ -391,7 +394,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 5,
                             Category = 0,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8634),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2757),
                             Description = "Human behavior and mental health",
                             Name = "Psychology"
                         },
@@ -399,7 +402,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 6,
                             Category = 0,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8637),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2761),
                             Description = "Financial accounting and bookkeeping",
                             Name = "Accounting"
                         },
@@ -407,7 +410,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 7,
                             Category = 0,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8639),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2762),
                             Description = "Marketing strategies and techniques",
                             Name = "Marketing"
                         },
@@ -415,7 +418,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 8,
                             Category = 0,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8640),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2764),
                             Description = "Financial management and analysis",
                             Name = "Finance"
                         },
@@ -423,7 +426,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 9,
                             Category = 0,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8642),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2765),
                             Description = "Mathematical concepts and problem solving",
                             Name = "Mathematics"
                         },
@@ -431,7 +434,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 10,
                             Category = 0,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8644),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2768),
                             Description = "Biological sciences and research",
                             Name = "Biology"
                         },
@@ -439,7 +442,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 11,
                             Category = 1,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8646),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2770),
                             Description = "C# programming language",
                             Name = "C#"
                         },
@@ -447,7 +450,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 12,
                             Category = 1,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8650),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2771),
                             Description = "JavaScript programming language",
                             Name = "JavaScript"
                         },
@@ -455,7 +458,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 13,
                             Category = 1,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8652),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2772),
                             Description = "Python programming language",
                             Name = "Python"
                         },
@@ -463,7 +466,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 14,
                             Category = 1,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8653),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2774),
                             Description = "Microsoft Azure cloud platform",
                             Name = "Azure"
                         },
@@ -471,7 +474,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 15,
                             Category = 1,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8654),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2775),
                             Description = "AI and machine learning techniques",
                             Name = "Machine Learning"
                         },
@@ -479,7 +482,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 16,
                             Category = 1,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8656),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2779),
                             Description = "Data analysis and visualization",
                             Name = "Data Analysis"
                         },
@@ -487,7 +490,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 17,
                             Category = 1,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8657),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2780),
                             Description = "Frontend and backend web development",
                             Name = "Web Development"
                         },
@@ -495,7 +498,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 18,
                             Category = 1,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8660),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2783),
                             Description = "Database design and management",
                             Name = "Database Management"
                         },
@@ -503,7 +506,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 19,
                             Category = 2,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8662),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2785),
                             Description = "Leading teams and projects",
                             Name = "Leadership"
                         },
@@ -511,7 +514,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 20,
                             Category = 2,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8663),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2786),
                             Description = "Effective communication skills",
                             Name = "Communication"
                         },
@@ -519,7 +522,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 21,
                             Category = 2,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8664),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2787),
                             Description = "Analytical and creative problem solving",
                             Name = "Problem Solving"
                         },
@@ -527,7 +530,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 22,
                             Category = 2,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8666),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2789),
                             Description = "Collaborative work and team building",
                             Name = "Teamwork"
                         },
@@ -535,7 +538,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 23,
                             Category = 2,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8668),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2791),
                             Description = "Efficient time and task management",
                             Name = "Time Management"
                         },
@@ -543,7 +546,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 24,
                             Category = 2,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8669),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2792),
                             Description = "Analytical and critical thinking",
                             Name = "Critical Thinking"
                         },
@@ -551,7 +554,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 25,
                             Category = 3,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8763),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2794),
                             Description = "Managing projects and resources",
                             Name = "Project Management"
                         },
@@ -559,7 +562,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 26,
                             Category = 3,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8765),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2795),
                             Description = "Professional networking and relationship building",
                             Name = "Networking"
                         },
@@ -567,7 +570,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 27,
                             Category = 3,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8766),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2796),
                             Description = "Guiding and developing others",
                             Name = "Mentoring"
                         },
@@ -575,7 +578,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 28,
                             Category = 3,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8768),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2798),
                             Description = "Career planning and advancement",
                             Name = "Career Development"
                         },
@@ -583,7 +586,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 29,
                             Category = 3,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8769),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2799),
                             Description = "Research methods and analysis",
                             Name = "Research"
                         },
@@ -591,7 +594,7 @@ namespace EagleConnect.Migrations
                         {
                             Id = 30,
                             Category = 3,
-                            CreatedAt = new DateTime(2025, 11, 20, 20, 5, 13, 47, DateTimeKind.Utc).AddTicks(8770),
+                            CreatedAt = new DateTime(2025, 11, 9, 23, 28, 5, 868, DateTimeKind.Utc).AddTicks(2800),
                             Description = "Educational instruction and training",
                             Name = "Teaching"
                         });

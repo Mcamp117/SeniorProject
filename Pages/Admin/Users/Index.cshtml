@@ -67,7 +67,6 @@
                                         <th>Email</th>
                                         <th>Type</th>
                                         <th>Role</th>
-                                        <th>Year</th>
                                         <th>Company</th>
                                         <th>Last Login</th>
                                         <th>Actions</th>
@@ -123,7 +122,6 @@
                                                     <span class="badge bg-secondary">User</span>
                                                 }
                                             </td>
-                                            <td>@user.Year</td>
                                             <td>@user.Company</td>
                                             <td>
                                                 @if (user.LastLoginAt.HasValue)
@@ -214,7 +212,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteForm" method="post" class="d-inline">
+                <form id="deleteForm" method="post" asp-page-handler="Delete" class="d-inline">
+                    <input type="hidden" id="deleteUserId" name="id" value="" />
                     <button type="submit" class="btn btn-danger">Delete User</button>
                 </form>
             </div>
@@ -225,7 +224,7 @@
 <script>
     function confirmDelete(userId, userName) {
         document.getElementById('userName').textContent = userName;
-        document.getElementById('deleteForm').action = '/Admin/Users/Delete?id=' + userId;
+        document.getElementById('deleteUserId').value = userId;
         new bootstrap.Modal(document.getElementById('deleteModal')).show();
     }
 </script>

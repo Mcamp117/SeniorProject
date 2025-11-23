@@ -1,0 +1,115 @@
+@page
+@model EagleConnect.Pages.Admin.Users.ApprovalModel
+@{
+    ViewData["Title"] = "User Approval";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-check"></i> User Approval</h2>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="card">
+                <div class="card-body">
+                    @if (Model.PendingUsers.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Type</th>
+                                        <th>Company</th>
+                                        <th>Job Title</th>
+                                        <th>Registered</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var user in Model.PendingUsers)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(user.ProfileImage))
+                                                    {
+                                                        <img src="@user.ProfileImage" alt="@user.FirstName @user.LastName" 
+                                                             class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" 
+                                                             style="width: 32px; height: 32px;">
+                                                            <i class="fas fa-user text-white" style="font-size: 14px;"></i>
+                                                        </div>
+                                                    }
+                                                    <div>
+                                                        <strong>@user.FirstName @user.LastName</strong>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>@user.Email</td>
+                                            <td>
+                                                <span class="badge bg-@(user.Type.ToString() switch {
+                                                    "Student" => "primary",
+                                                    "Alumni" => "success", 
+                                                    "Faculty" => "info",
+                                                    "External" => "warning",
+                                                    _ => "secondary"
+                                                })">@user.Type</span>
+                                            </td>
+                                            <td>@user.Company</td>
+                                            <td>@user.JobTitle</td>
+                                            <td>
+                                                <small>@user.CreatedAt.ToString("MMM dd, yyyy HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <form method="post" asp-page-handler="Approve" class="d-inline">
+                                                        <input type="hidden" name="userId" value="@user.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-success" 
+                                                                onclick="return confirm('Approve @user.FirstName @user.LastName?')">
+                                                            <i class="fas fa-check"></i> Approve
+                                                        </button>
+                                                    </form>
+                                                    <form method="post" asp-page-handler="Deny" class="d-inline">
+                                                        <input type="hidden" name="userId" value="@user.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-danger" 
+                                                                onclick="return confirm('Deny and delete @user.FirstName @user.LastName? This action cannot be undone.')">
+                                                            <i class="fas fa-times"></i> Deny
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h4 class="text-muted">No pending approvals</h4>
+                            <p class="text-muted">All users have been reviewed.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

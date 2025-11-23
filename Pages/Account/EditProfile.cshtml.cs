@@ -47,10 +47,6 @@ namespace EagleConnect.Pages.Account
             [Display(Name = "User Type")]
             public UserType Type { get; set; }
 
-            [Display(Name = "Year")]
-            [StringLength(20)]
-            public string? Year { get; set; }
-
             [Display(Name = "Company")]
             [StringLength(100)]
             public string? Company { get; set; }
@@ -60,7 +56,7 @@ namespace EagleConnect.Pages.Account
             public string? JobTitle { get; set; }
 
             [Display(Name = "Graduation Year")]
-            public int GraduationYear { get; set; }
+            public int? GraduationYear { get; set; }
 
             [Display(Name = "Profile Image URL")]
             [StringLength(255)]
@@ -89,10 +85,9 @@ namespace EagleConnect.Pages.Account
             Input.LastName = CurrentUser.LastName;
             Input.Email = CurrentUser.Email ?? string.Empty;
             Input.Type = CurrentUser.Type;
-            Input.Year = string.IsNullOrWhiteSpace(CurrentUser.Year) ? null : CurrentUser.Year;
             Input.Company = string.IsNullOrWhiteSpace(CurrentUser.Company) ? null : CurrentUser.Company;
             Input.JobTitle = string.IsNullOrWhiteSpace(CurrentUser.JobTitle) ? null : CurrentUser.JobTitle;
-            Input.GraduationYear = CurrentUser.GraduationYear;
+            Input.GraduationYear = CurrentUser.GraduationYear == 0 ? null : CurrentUser.GraduationYear;
             Input.ProfileImage = string.IsNullOrWhiteSpace(CurrentUser.ProfileImage) ? "/images/default-avatar.svg" : CurrentUser.ProfileImage;
             Input.Bio = string.IsNullOrWhiteSpace(CurrentUser.Bio) ? null : CurrentUser.Bio;
 
@@ -102,12 +97,25 @@ namespace EagleConnect.Pages.Account
         public async Task<IActionResult> OnPostAsync()
         {
             // Remove validation errors for optional fields - they can be empty
-            ModelState.Remove("Input.Year");
             ModelState.Remove("Input.Bio");
             ModelState.Remove("Input.Company");
             ModelState.Remove("Input.JobTitle");
             ModelState.Remove("Input.ProfileImage");
             ModelState.Remove("Input.ProfileImageFile");
+            ModelState.Remove("Input.GraduationYear");
+            
+            // Validate GraduationYear if provided (must be >= 1900)
+            if (Input.GraduationYear.HasValue && Input.GraduationYear.Value > 0)
+            {
+                if (Input.GraduationYear.Value < 1900)
+                {
+                    ModelState.AddModelError("Input.GraduationYear", "Graduation year must be 1900 or later.");
+                }
+                else if (Input.GraduationYear.Value > DateTime.Now.Year + 10)
+                {
+                    ModelState.AddModelError("Input.GraduationYear", $"Graduation year cannot be more than {DateTime.Now.Year + 10}.");
+                }
+            }
             
             // Only validate required fields
             if (string.IsNullOrWhiteSpace(Input.FirstName))
@@ -213,10 +221,10 @@ namespace EagleConnect.Pages.Account
                 CurrentUser.Email = Input.Email;
                 CurrentUser.UserName = Input.Email; // Keep username in sync with email
                 CurrentUser.Type = Input.Type;
-                CurrentUser.Year = Input.Year ?? string.Empty;
                 CurrentUser.Company = Input.Company ?? string.Empty;
                 CurrentUser.JobTitle = Input.JobTitle ?? string.Empty;
-                CurrentUser.GraduationYear = Input.GraduationYear;
+                // Only set GraduationYear if a valid value is provided (not null and > 0)
+                CurrentUser.GraduationYear = (Input.GraduationYear.HasValue && Input.GraduationYear.Value > 0) ? Input.GraduationYear.Value : 0;
                 CurrentUser.ProfileImage = profileImagePath;
                 CurrentUser.Bio = Input.Bio ?? string.Empty;
 

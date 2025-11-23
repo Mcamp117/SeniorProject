@@ -34,11 +34,8 @@
                                                 <small class="d-block text-muted">@otherUser?.Email</small>
                                             </div>
                                         </div>
-                                        @if (connection.User1Id == Model.CurrentUser?.Id)
-                                        {
-                                            <small class="text-muted">Waiting for response...</small>
-                                        }
-                                        else
+                                        @* Only show Accept/Decline if current user is NOT the requester *@
+                                        @if (connection.RequestedById != Model.CurrentUser?.Id)
                                         {
                                             <form method="post" class="d-inline">
                                                 <input type="hidden" name="connectionId" value="@connection.Id" />
@@ -120,14 +117,24 @@
                 
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-light">
-                        <div class="d-flex align-items-center">
-                            <img src="@(otherUser?.ProfileImage ?? "/images/default-avatar.svg")" 
-                                 class="rounded-circle me-2" 
-                                 style="width: 40px; height: 40px; object-fit: cover;" />
-                            <div>
-                                <h6 class="mb-0">@otherUser?.FirstName @otherUser?.LastName</h6>
-                                <small class="text-muted">@otherUser?.Email</small>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <img src="@(otherUser?.ProfileImage ?? "/images/default-avatar.svg")" 
+                                     class="rounded-circle me-2" 
+                                     style="width: 40px; height: 40px; object-fit: cover;" />
+                                <div>
+                                    <h6 class="mb-0">@otherUser?.FirstName @otherUser?.LastName</h6>
+                                    <small class="text-muted">@otherUser?.Email</small>
+                                </div>
                             </div>
+                            <form method="post" asp-page-handler="Delete" class="d-inline">
+                                <input type="hidden" name="connectionId" value="@Model.SelectedConnectionId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                        onclick="return confirm('Are you sure you want to delete this connection? This will permanently remove the connection and all associated messages.')" 
+                                        title="Delete Connection">
+                                    <i class="fas fa-trash"></i> Delete Connection
+                                </button>
+                            </form>
                         </div>
                     </div>
                     <div class="card-body p-0 d-flex flex-column" style="height: calc(100vh - 300px);">

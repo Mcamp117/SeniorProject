@@ -48,13 +48,6 @@
 
                                 @* Major removed *@
 
-                                @if (!string.IsNullOrEmpty(Model.CurrentUser.Year))
-                                {
-                                    <div class="mb-3">
-                                        <strong>Year:</strong> @Model.CurrentUser.Year
-                                    </div>
-                                }
-
                                 @if (Model.CurrentUser.Type == UserType.Alumni && Model.CurrentUser.GraduationYear > 0)
                                 {
                                     <div class="mb-3">

@@ -40,7 +40,10 @@
                                     </div>
                                     <div class="col-md-6">
                                         <h6>Mentee: @mentorship.Mentee?.FirstName @mentorship.Mentee?.LastName</h6>
-                                        <small class="text-muted">@mentorship.Mentee?.Year</small>
+                                        @if (mentorship.Mentee?.GraduationYear > 0)
+                                        {
+                                            <small class="text-muted">Graduation Year: @mentorship.Mentee.GraduationYear</small>
+                                        }
                                     </div>
                                 </div>
                                 <p class="mt-2 mb-0"><small>@mentorship.Notes</small></p>

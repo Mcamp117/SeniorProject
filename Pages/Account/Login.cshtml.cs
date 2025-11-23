@@ -53,6 +53,10 @@ namespace EagleConnect.Pages.Account
             {
                 ModelState.AddModelError(string.Empty, "Your account is locked out. Please try again later.");
             }
+            else if (result.IsNotAllowed)
+            {
+                ModelState.AddModelError(string.Empty, "Your account is pending approval by an administrator. Please wait for approval before logging in.");
+            }
             else
             {
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");

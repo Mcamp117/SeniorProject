@@ -55,6 +55,7 @@ public class PeopleModel : PageModel
                 u.LastName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.Company.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.JobTitle.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                (!string.IsNullOrEmpty(u.Bio) && u.Bio.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)) ||
                 u.UserSkills.Any(us => us.Skill!.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
             );
         }

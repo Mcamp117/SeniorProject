@@ -38,7 +38,7 @@ namespace EagleConnect.Services
                 FirstName = firstName,
                 LastName = lastName,
                 Type = userType,
-                GraduationYear = graduationYear ?? 0,
+                GraduationYear = graduationYear,
                 Company = company ?? string.Empty,
                 JobTitle = jobTitle ?? string.Empty,
                 CreatedAt = DateTime.UtcNow,

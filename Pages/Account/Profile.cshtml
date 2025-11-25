@@ -65,7 +65,7 @@
 
                         <!-- Profile Details -->
                         <div class="row g-4">
-                            @if (Model.CurrentUser.Type == UserType.Alumni && Model.CurrentUser.GraduationYear > 0)
+                            @if (Model.CurrentUser.Type == UserType.Alumni && Model.CurrentUser.GraduationYear.HasValue && Model.CurrentUser.GraduationYear > 0)
                             {
                                 <div class="col-md-6">
                                     <div class="d-flex align-items-center p-3 rounded" style="background: var(--usi-light-blue-soft);">

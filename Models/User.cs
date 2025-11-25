@@ -11,7 +11,7 @@ namespace EagleConnect.Models
         public string ProfileImage { get; set; } = "/images/default-avatar.svg";
         public string Company { get; set; } = string.Empty;
         public string JobTitle { get; set; } = string.Empty;
-        public int GraduationYear { get; set; }
+        public int? GraduationYear { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastLoginAt { get; set; }
         public bool IsApproved { get; set; } = false; // Admin approval required
@@ -46,6 +46,6 @@ namespace EagleConnect.Models
         public List<string> Skills { get; set; } = new List<string>();
         public string Company { get; set; } = string.Empty;
         public string JobTitle { get; set; } = string.Empty;
-        public int GraduationYear { get; set; }
+        public int? GraduationYear { get; set; }
     }
 }

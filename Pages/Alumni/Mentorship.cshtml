@@ -40,9 +40,9 @@
                                     </div>
                                     <div class="col-md-6">
                                         <h6>Mentee: @mentorship.Mentee?.FirstName @mentorship.Mentee?.LastName</h6>
-                                        @if (mentorship.Mentee?.GraduationYear > 0)
+                                        @if (mentorship.Mentee?.GraduationYear.HasValue == true && mentorship.Mentee.GraduationYear > 0)
                                         {
-                                            <small class="text-muted">Graduation Year: @mentorship.Mentee.GraduationYear</small>
+                                            <small class="text-muted">Graduation Year: @mentorship.Mentee.GraduationYear.Value</small>
                                         }
                                     </div>
                                 </div>
@@ -69,7 +69,10 @@
                         <div class="border-bottom pb-2 mb-2">
                             <h6>@mentor.FirstName @mentor.LastName</h6>
                             <small class="text-muted">@mentor.JobTitle at @mentor.Company</small><br>
-                            <small>Class of @mentor.GraduationYear</small>
+                            @if (mentor.GraduationYear.HasValue)
+                            {
+                                <small>Class of @mentor.GraduationYear.Value</small>
+                            }
                         </div>
                     }
                     @if (Model.AvailableMentors.Count > 5)

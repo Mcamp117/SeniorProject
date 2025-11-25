@@ -132,7 +132,7 @@
                                         <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.UserModel!.JobTitle) ? "Not specified" : Model.UserModel.JobTitle)</dd>
                                         
                                         <dt class="col-sm-4">Graduation Year:</dt>
-                                        <dd class="col-sm-8">@(Model.UserModel!.GraduationYear == 0 ? "Not specified" : Model.UserModel.GraduationYear.ToString())</dd>
+                                        <dd class="col-sm-8">@(Model.UserModel!.GraduationYear.HasValue ? Model.UserModel.GraduationYear.Value.ToString() : "Not specified")</dd>
                                     </dl>
                                 </div>
                             </div>

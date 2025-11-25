@@ -68,7 +68,7 @@ public class EditModel : PageModel
         public string? JobTitle { get; set; }
         
         [Display(Name = "Graduation Year")]
-        public int GraduationYear { get; set; }
+        public int? GraduationYear { get; set; }
         
         [Display(Name = "Bio")]
         public string? Bio { get; set; }

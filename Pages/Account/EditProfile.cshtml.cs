@@ -83,7 +83,7 @@ namespace EagleConnect.Pages.Account
             Input.Email = CurrentUser.Email ?? string.Empty;
             Input.Company = string.IsNullOrWhiteSpace(CurrentUser.Company) ? null : CurrentUser.Company;
             Input.JobTitle = string.IsNullOrWhiteSpace(CurrentUser.JobTitle) ? null : CurrentUser.JobTitle;
-            Input.GraduationYear = CurrentUser.GraduationYear == 0 ? null : CurrentUser.GraduationYear;
+            Input.GraduationYear = CurrentUser.GraduationYear;
             Input.ProfileImage = string.IsNullOrWhiteSpace(CurrentUser.ProfileImage) ? "/images/default-avatar.svg" : CurrentUser.ProfileImage;
             Input.Bio = string.IsNullOrWhiteSpace(CurrentUser.Bio) ? null : CurrentUser.Bio;
 
@@ -219,8 +219,8 @@ namespace EagleConnect.Pages.Account
                 // Note: User Type can only be changed by admins, so we don't update it here
                 CurrentUser.Company = Input.Company ?? string.Empty;
                 CurrentUser.JobTitle = Input.JobTitle ?? string.Empty;
-                // Only set GraduationYear if a valid value is provided (not null and > 0)
-                CurrentUser.GraduationYear = (Input.GraduationYear.HasValue && Input.GraduationYear.Value > 0) ? Input.GraduationYear.Value : 0;
+                // Set GraduationYear - null if not provided or 0
+                CurrentUser.GraduationYear = (Input.GraduationYear.HasValue && Input.GraduationYear.Value > 0) ? Input.GraduationYear.Value : null;
                 CurrentUser.ProfileImage = profileImagePath;
                 CurrentUser.Bio = Input.Bio ?? string.Empty;
 

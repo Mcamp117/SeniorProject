@@ -106,9 +106,9 @@
                                     }
                                     else if (user.Type == EagleConnect.Models.UserType.Alumni)
                                     {
-                                        @if (user.GraduationYear > 0)
+                                        @if (user.GraduationYear.HasValue && user.GraduationYear > 0)
                                         {
-                                            <span class="badge bg-success">🦅 Alumni '@user.GraduationYear</span>
+                                            <span class="badge bg-success">🦅 Alumni '@user.GraduationYear.Value</span>
                                         }
                                         else
                                         {

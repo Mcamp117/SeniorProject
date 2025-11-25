@@ -96,7 +96,10 @@
                                 <h5 class="card-title">@alum.FirstName @alum.LastName</h5>
                                 <p class="card-text">
                                     <strong>@alum.JobTitle</strong> at @alum.Company<br>
-                                    <small class="text-muted">Class of @alum.GraduationYear</small>
+                                    @if (alum.GraduationYear.HasValue)
+                                    {
+                                        <small class="text-muted">Class of @alum.GraduationYear.Value</small>
+                                    }
                                 </p>
                                 @if (!string.IsNullOrEmpty(alum.Bio))
                                 {

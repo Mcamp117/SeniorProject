@@ -19,16 +19,16 @@ public class IndexModel : PageModel
     public List<ApplicationUser> Users { get; set; } = new();
     public Dictionary<string, List<string>> UserRoles { get; set; } = new();
     
-    [BindProperty(SupportsGet = true)]
+    [FromQuery(Name = "searchTerm")]
     public string SearchTerm { get; set; } = string.Empty;
     
-    [BindProperty(SupportsGet = true)]
+    [FromQuery(Name = "userType")]
     public string SelectedUserType { get; set; } = string.Empty;
     
-    [BindProperty(SupportsGet = true)]
+    [FromQuery(Name = "role")]
     public string SelectedRole { get; set; } = string.Empty;
     
-    [BindProperty(SupportsGet = true)]
+    [FromQuery(Name = "p")]
     public int CurrentPage { get; set; } = 1;
     
     public int TotalPages { get; set; }
@@ -67,10 +67,13 @@ public class IndexModel : PageModel
         var totalCount = filteredUsers.Count();
         TotalPages = (int)Math.Ceiling((double)totalCount / PageSize);
         
+        // Ensure page is within valid range
+        var safePage = Math.Max(1, Math.Min(CurrentPage, Math.Max(1, TotalPages)));
+        
         Users = filteredUsers
             .OrderBy(u => u.FirstName)
             .ThenBy(u => u.LastName)
-            .Skip((CurrentPage - 1) * PageSize)
+            .Skip((safePage - 1) * PageSize)
             .Take(PageSize)
             .ToList();
     }
@@ -92,6 +95,6 @@ public class IndexModel : PageModel
             TempData["ErrorMessage"] = $"Error deleting user: {ex.Message}";
         }
 
-        return RedirectToPage();
+        return RedirectToPage(new { p = CurrentPage, searchTerm = SearchTerm, userType = SelectedUserType, role = SelectedRole });
     }
 }

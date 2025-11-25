@@ -66,11 +66,11 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    <h4>@Model.ActiveRelationships</h4>
-                                    <p class="mb-0">Active Relationships</p>
+                                    <h4>@Model.ActivePosts</h4>
+                                    <p class="mb-0">Active Posts</p>
                                 </div>
                                 <div class="align-self-center">
-                                    <i class="fas fa-handshake fa-2x"></i>
+                                    <i class="fas fa-bullhorn fa-2x"></i>
                                 </div>
                             </div>
                         </div>
@@ -110,17 +110,13 @@
                         </div>
                         <div class="card-body">
                             <div class="row text-center">
-                                <div class="col-4">
+                                <div class="col-6">
                                     <h4 class="text-success">@Model.ActivePosts</h4>
                                     <small class="text-muted">Active Posts</small>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-6">
                                     <h4 class="text-warning">@Model.TotalOrganizations</h4>
                                     <small class="text-muted">Total Organizations</small>
-                                </div>
-                                <div class="col-4">
-                                    <h4 class="text-info">@Model.TotalRelationships</h4>
-                                    <small class="text-muted">Total Relationships</small>
                                 </div>
                             </div>
                         </div>
@@ -142,19 +138,19 @@
                                         <i class="fas fa-plus"></i> Add Skill
                                     </a>
                                 </div>
-                                <div class="col-md-3 mb-2">
+                                <div class="col-md-4 mb-2">
                                     <a asp-page="/Admin/Organizations/Create" class="btn btn-outline-success w-100">
                                         <i class="fas fa-plus"></i> Add Organization
                                     </a>
                                 </div>
-                                <div class="col-md-3 mb-2">
-                                    <a asp-page="/Admin/Relationships/Create" class="btn btn-outline-info w-100">
-                                        <i class="fas fa-plus"></i> Create Relationship
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-2">
+                                <div class="col-md-4 mb-2">
                                     <a asp-page="/Admin/Posts/Create" class="btn btn-outline-warning w-100">
                                         <i class="fas fa-plus"></i> Create Post
+                                    </a>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <a asp-page="/Admin/Connections/Index" class="btn btn-outline-info w-100">
+                                        <i class="fas fa-user-friends"></i> View Connections
                                     </a>
                                 </div>
                             </div>

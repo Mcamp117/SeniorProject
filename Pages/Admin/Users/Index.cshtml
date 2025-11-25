@@ -2,7 +2,6 @@
 @model EagleConnect.Pages.Admin.Users.IndexModel
 @{
     ViewData["Title"] = "User Management";
-    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid">
@@ -163,25 +162,50 @@
                                     @if (Model.CurrentPage > 1)
                                     {
                                         <li class="page-item">
-                                            <a class="page-link" href="?page=@(Model.CurrentPage - 1)&searchTerm=@Model.SearchTerm&userType=@Model.SelectedUserType&role=@Model.SelectedRole">Previous</a>
+                                            <a class="page-link" href="?p=@(Model.CurrentPage - 1)@(string.IsNullOrEmpty(Model.SearchTerm) ? "" : "&searchTerm=" + System.Net.WebUtility.UrlEncode(Model.SearchTerm))@(string.IsNullOrEmpty(Model.SelectedUserType) ? "" : "&userType=" + Model.SelectedUserType)@(string.IsNullOrEmpty(Model.SelectedRole) ? "" : "&role=" + Model.SelectedRole)">Previous</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="page-item disabled">
+                                            <span class="page-link">Previous</span>
                                         </li>
                                     }
                                     
-                                    @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                                    @for (int i = 1; i <= Model.TotalPages; i++)
                                     {
-                                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                                            <a class="page-link" href="?page=@i&searchTerm=@Model.SearchTerm&userType=@Model.SelectedUserType&role=@Model.SelectedRole">@i</a>
-                                        </li>
+                                        var pageNum = i;
+                                        @if (pageNum == Model.CurrentPage)
+                                        {
+                                            <li class="page-item active">
+                                                <span class="page-link">@pageNum</span>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" href="?p=@pageNum@(string.IsNullOrEmpty(Model.SearchTerm) ? "" : "&searchTerm=" + System.Net.WebUtility.UrlEncode(Model.SearchTerm))@(string.IsNullOrEmpty(Model.SelectedUserType) ? "" : "&userType=" + Model.SelectedUserType)@(string.IsNullOrEmpty(Model.SelectedRole) ? "" : "&role=" + Model.SelectedRole)">@pageNum</a>
+                                            </li>
+                                        }
                                     }
                                     
                                     @if (Model.CurrentPage < Model.TotalPages)
                                     {
                                         <li class="page-item">
-                                            <a class="page-link" href="?page=@(Model.CurrentPage + 1)&searchTerm=@Model.SearchTerm&userType=@Model.SelectedUserType&role=@Model.SelectedRole">Next</a>
+                                            <a class="page-link" href="?p=@(Model.CurrentPage + 1)@(string.IsNullOrEmpty(Model.SearchTerm) ? "" : "&searchTerm=" + System.Net.WebUtility.UrlEncode(Model.SearchTerm))@(string.IsNullOrEmpty(Model.SelectedUserType) ? "" : "&userType=" + Model.SelectedUserType)@(string.IsNullOrEmpty(Model.SelectedRole) ? "" : "&role=" + Model.SelectedRole)">Next</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="page-item disabled">
+                                            <span class="page-link">Next</span>
                                         </li>
                                     }
                                 </ul>
                             </nav>
+                            <div class="text-center text-muted mt-2">
+                                <small>Page @Model.CurrentPage of @Model.TotalPages (showing @Model.Users.Count users)</small>
+                            </div>
                         }
                     }
                     else

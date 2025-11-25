@@ -44,9 +44,6 @@ namespace EagleConnect.Pages.Account
             [Display(Name = "Email")]
             public string Email { get; set; } = string.Empty;
 
-            [Display(Name = "User Type")]
-            public UserType Type { get; set; }
-
             [Display(Name = "Company")]
             [StringLength(100)]
             public string? Company { get; set; }
@@ -84,7 +81,6 @@ namespace EagleConnect.Pages.Account
             Input.FirstName = CurrentUser.FirstName;
             Input.LastName = CurrentUser.LastName;
             Input.Email = CurrentUser.Email ?? string.Empty;
-            Input.Type = CurrentUser.Type;
             Input.Company = string.IsNullOrWhiteSpace(CurrentUser.Company) ? null : CurrentUser.Company;
             Input.JobTitle = string.IsNullOrWhiteSpace(CurrentUser.JobTitle) ? null : CurrentUser.JobTitle;
             Input.GraduationYear = CurrentUser.GraduationYear == 0 ? null : CurrentUser.GraduationYear;
@@ -220,7 +216,7 @@ namespace EagleConnect.Pages.Account
                 CurrentUser.LastName = Input.LastName;
                 CurrentUser.Email = Input.Email;
                 CurrentUser.UserName = Input.Email; // Keep username in sync with email
-                CurrentUser.Type = Input.Type;
+                // Note: User Type can only be changed by admins, so we don't update it here
                 CurrentUser.Company = Input.Company ?? string.Empty;
                 CurrentUser.JobTitle = Input.JobTitle ?? string.Empty;
                 // Only set GraduationYear if a valid value is provided (not null and > 0)

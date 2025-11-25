@@ -37,19 +37,6 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Input.Type" class="form-label"></label>
-                                <select asp-for="Input.Type" class="form-select">
-                                    <option value="Student">Student</option>
-                                    <option value="Alumni">Alumni</option>
-                                    <option value="Faculty">Faculty</option>
-                                    <option value="External">External</option>
-                                </select>
-                                <span asp-validation-for="Input.Type" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
                                 <label asp-for="Input.Company" class="form-label"></label>
                                 <input asp-for="Input.Company" class="form-control" />
                                 <span asp-validation-for="Input.Company" class="text-danger"></span>

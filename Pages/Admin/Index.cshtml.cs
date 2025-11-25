@@ -11,16 +11,14 @@ public class IndexModel : PageModel
 {
     private readonly ISkillService _skillService;
     private readonly IStudentOrganizationService _organizationService;
-    private readonly IRelationshipService _relationshipService;
     private readonly IConnectionPostService _postService;
     private readonly IUserService _userService;
 
     public IndexModel(ISkillService skillService, IStudentOrganizationService organizationService,
-        IRelationshipService relationshipService, IConnectionPostService postService, IUserService userService)
+        IConnectionPostService postService, IUserService userService)
     {
         _skillService = skillService;
         _organizationService = organizationService;
-        _relationshipService = relationshipService;
         _postService = postService;
         _userService = userService;
     }
@@ -28,8 +26,6 @@ public class IndexModel : PageModel
     public int TotalSkills { get; set; }
     public int TotalOrganizations { get; set; }
     public int ActiveOrganizations { get; set; }
-    public int TotalRelationships { get; set; }
-    public int ActiveRelationships { get; set; }
     public int TotalPosts { get; set; }
     public int ActivePosts { get; set; }
     public int TotalUsers { get; set; }
@@ -44,10 +40,6 @@ public class IndexModel : PageModel
         var organizations = await _organizationService.GetAllOrganizationsAsync();
         TotalOrganizations = organizations.Count;
         ActiveOrganizations = organizations.Count(o => o.IsActive);
-
-        var relationships = await _relationshipService.GetAllRelationshipsAsync();
-        TotalRelationships = relationships.Count;
-        ActiveRelationships = relationships.Count(r => r.Status == "Active");
 
         var posts = await _postService.GetAllConnectionPostsAsync();
         TotalPosts = posts.Count;

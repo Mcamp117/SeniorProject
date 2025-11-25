@@ -539,6 +539,9 @@ namespace EagleConnect.Services
             existingUser.UserName = user.Email; // Keep username in sync with email
             existingUser.Type = user.Type;
             existingUser.GraduationYear = user.GraduationYear;
+            existingUser.IsApproved = user.IsApproved;
+            existingUser.PhoneNumber = user.PhoneNumber;
+            existingUser.EmailConfirmed = user.EmailConfirmed;
             
             // Update optional properties - use empty string if null/whitespace to avoid database null constraint errors
             existingUser.Bio = string.IsNullOrWhiteSpace(user.Bio) ? string.Empty : user.Bio;

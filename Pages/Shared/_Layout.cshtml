@@ -4,80 +4,76 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - EagleConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/EagleConnect.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #002856 0%, #001a3d 100%);">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="@(User.Identity?.IsAuthenticated == true ? "/Index" : "/Welcome")">EagleConnect</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-page="@(User.Identity?.IsAuthenticated == true ? "/Index" : "/Welcome")">
+                    <span class="me-2">🦅</span>
+                    <span>EagleConnect</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="collapse navbar-collapse" id="mainNavbar">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <ul class="navbar-nav flex-grow-1">
+                        <ul class="navbar-nav me-auto">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="/home">Home</a>
+                                <a class="nav-link" href="/home">Home</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="postsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-bullhorn"></i> Posts
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="postsDropdown">
-                                    <li><a class="dropdown-item" asp-page="/Posts/Index"><i class="fas fa-list"></i> All Posts</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Posts/Create"><i class="fas fa-plus"></i> Create Post</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Posts/MyPosts"><i class="fas fa-user"></i> My Posts</a></li>
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Posts</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-page="/Posts/Index"><i class="fas fa-list me-2"></i>All Posts</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Posts/Create"><i class="fas fa-plus me-2"></i>Create Post</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Posts/MyPosts"><i class="fas fa-user me-2"></i>My Posts</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/People">Browse People</a>
+                                <a class="nav-link" asp-page="/People">People</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Connections">
-                                    <i class="fas fa-comments"></i> Connections
-                                </a>
+                                <a class="nav-link" asp-page="/Connections">Connections</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Organizations">Organizations</a>
+                                <a class="nav-link" asp-page="/Organizations">Organizations</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="alumniDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Alumni/Student
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="alumniDropdown">
-                                    <li><a class="dropdown-item" asp-page="/Alumni/Index">Alumni Directory & Networking</a></li>
-                                    <li><a class="dropdown-item" asp-page="/Alumni/Mentorship">Mentorship Program</a></li>
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Alumni</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-page="/Alumni/Index"><i class="fas fa-address-book me-2"></i>Directory</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Alumni/Mentorship"><i class="fas fa-hands-helping me-2"></i>Mentorship</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="externalDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    External Users
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="externalDropdown">
-                                    <li><a class="dropdown-item" asp-page="/External/Index">External Mentors</a></li>
-                                    <li><a class="dropdown-item" asp-page="/External/Employers">Employers</a></li>
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">External</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-page="/External/Index"><i class="fas fa-user-tie me-2"></i>Mentors</a></li>
+                                    <li><a class="dropdown-item" asp-page="/External/Employers"><i class="fas fa-briefcase me-2"></i>Employers</a></li>
                                 </ul>
                             </li>
                             @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-cog"></i> Admin
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-shield-alt me-1"></i>Admin
                                     </a>
-                                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                        <li><a class="dropdown-item" asp-page="/Admin/Index"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-page="/Admin/Index"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" asp-page="/Admin/Users/Index"><i class="fas fa-user-cog"></i> User Management</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Admin/Skills/Index"><i class="fas fa-tags"></i> Skills</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Admin/Organizations/Index"><i class="fas fa-users"></i> Organizations</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Admin/Posts/Index"><i class="fas fa-bullhorn"></i> Connection Posts</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Admin/Connections/Index"><i class="fas fa-user-friends"></i> Connections</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Admin/Users/Index"><i class="fas fa-users me-2"></i>Users</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Admin/Skills/Index"><i class="fas fa-tags me-2"></i>Skills</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Admin/Organizations/Index"><i class="fas fa-building me-2"></i>Organizations</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Admin/Posts/Index"><i class="fas fa-bullhorn me-2"></i>Posts</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Admin/Connections/Index"><i class="fas fa-link me-2"></i>Connections</a></li>
                                     </ul>
                                 </li>
                             }
@@ -85,34 +81,38 @@
                     }
                     else
                     {
-                        <ul class="navbar-nav flex-grow-1">
+                        <ul class="navbar-nav me-auto">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Welcome">Home</a>
+                                <a class="nav-link" asp-page="/Welcome">Home</a>
                             </li>
                         </ul>
                     }
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav ms-auto">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user"></i> @User.Identity.Name
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="avatar-sm bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 28px; height: 28px;">
+                                        <i class="fas fa-user" style="font-size: 0.7rem;"></i>
+                                    </span>
+                                    <span>@User.Identity.Name</span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li><a class="dropdown-item" asp-page="/Account/Profile"><i class="fas fa-user-circle"></i> Profile</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-page="/Account/Profile"><i class="fas fa-user-circle me-2"></i>Profile</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Account/EditProfile"><i class="fas fa-edit me-2"></i>Edit Profile</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Account/ChangePassword"><i class="fas fa-key me-2"></i>Change Password</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" asp-page="/Account/Logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                                    <li><a class="dropdown-item text-danger" asp-page="/Account/Logout"><i class="fas fa-sign-out-alt me-2"></i>Sign Out</a></li>
                                 </ul>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Account/Login">Sign In</a>
+                                <a class="nav-link" asp-page="/Account/Login">Sign In</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Account/Register">Register</a>
+                                <a class="btn btn-sm ms-2" asp-page="/Account/Register" style="background: linear-gradient(135deg, #FCB643 0%, #e09a1f 100%); color: #002856; font-weight: 600; padding: 0.4rem 1rem; border-radius: 20px;">Register</a>
                             </li>
                         }
                     </ul>
@@ -120,22 +120,70 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-5 mb-5">
+    
+    <main class="flex-grow-1 py-4">
+        <div class="container">
             @RenderBody()
-        </main>
-    </div>
+        </div>
+    </main>
 
-    <footer class="border-top footer text-muted mt-5">
-        <div class="container py-4">
-            &copy; 2025 - EagleConnect - <a asp-area="" asp-page="/Privacy">Privacy</a>
+    <footer style="background: linear-gradient(135deg, #001a3d 0%, #002856 100%); border-top: 4px solid; border-image: linear-gradient(90deg, #CF102D 0%, #FCB643 50%, #8ED8F8 100%) 1;">
+        <div class="container py-5">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h5 class="text-white fw-bold mb-3">
+                        <span class="me-2">🦅</span>EagleConnect
+                    </h5>
+                    <p class="text-white-50 mb-4">Connecting students, alumni, and professionals at the University of Southern Indiana.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-white-50 fs-5"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-white-50 fs-5"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white-50 fs-5"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-white-50 fs-5"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white fw-bold mb-3 text-uppercase small">Platform</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="/home" class="text-white-50 text-decoration-none small">Home</a></li>
+                        <li class="mb-2"><a asp-page="/People" class="text-white-50 text-decoration-none small">People</a></li>
+                        <li class="mb-2"><a asp-page="/Organizations" class="text-white-50 text-decoration-none small">Organizations</a></li>
+                        <li class="mb-2"><a asp-page="/Posts/Index" class="text-white-50 text-decoration-none small">Posts</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white fw-bold mb-3 text-uppercase small">Support</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a asp-page="/Help" class="text-white-50 text-decoration-none small">Help Center</a></li>
+                        <li class="mb-2"><a asp-page="/Contact" class="text-white-50 text-decoration-none small">Contact Us</a></li>
+                        <li class="mb-2"><a asp-page="/Privacy" class="text-white-50 text-decoration-none small">Privacy Policy</a></li>
+                        <li class="mb-2"><a asp-page="/Terms" class="text-white-50 text-decoration-none small">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="text-white fw-bold mb-3 text-uppercase small">Newsletter</h6>
+                    <p class="text-white-50 small mb-3">Get updates on features and opportunities.</p>
+                    <div class="input-group">
+                        <input type="email" class="form-control form-control-sm" placeholder="Enter email" style="border-radius: 20px 0 0 20px; border: none;">
+                        <button class="btn btn-sm px-3" type="button" style="background: #FCB643; color: #002856; font-weight: 600; border-radius: 0 20px 20px 0;">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4 border-secondary opacity-25">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <small class="text-white-50">&copy; 2025 EagleConnect - University of Southern Indiana</small>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <small class="text-white-50">Made with <i class="fas fa-heart text-danger"></i> for USI</small>
+                </div>
+            </div>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

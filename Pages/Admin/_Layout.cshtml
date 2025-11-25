@@ -2,54 +2,61 @@
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid">
-    <div class="row">
-        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-            <div class="position-sticky pt-3">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Index">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Users/Index">
-                            <i class="fas fa-user-cog"></i> User Management
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Users/Approval">
-                            <i class="fas fa-user-check"></i> User Approval
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Skills/Index">
-                            <i class="fas fa-tags"></i> Skills
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Organizations/Index">
-                            <i class="fas fa-users"></i> Organizations
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Posts/Index">
-                            <i class="fas fa-bullhorn"></i> Connection Posts
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Connections/Index">
-                            <i class="fas fa-user-friends"></i> Connections
-                        </a>
-                    </li>
-                </ul>
+<div class="row g-0">
+    <nav class="col-md-3 col-lg-2 sidebar d-none d-md-block">
+        <div class="py-4 px-2">
+            <div class="px-3 mb-4">
+                <span class="text-white-50 text-uppercase small fw-bold" style="letter-spacing: 0.1em;">Admin Panel</span>
             </div>
-        </nav>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Admin/Index">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Admin/Users/Index">
+                        <i class="fas fa-users"></i> Users
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Admin/Users/Approval">
+                        <i class="fas fa-user-check"></i> Approval
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Admin/Skills/Index">
+                        <i class="fas fa-tags"></i> Skills
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Admin/Organizations/Index">
+                        <i class="fas fa-building"></i> Organizations
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Admin/Posts/Index">
+                        <i class="fas fa-bullhorn"></i> Posts
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Admin/Connections/Index">
+                        <i class="fas fa-link"></i> Connections
+                    </a>
+                </li>
+            </ul>
+            <hr class="my-4 mx-3 border-secondary opacity-25">
+            <div class="px-3">
+                <a asp-page="/Index" class="btn btn-outline-light btn-sm w-100">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Site
+                </a>
+            </div>
+        </div>
+    </nav>
 
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            @RenderBody()
-        </main>
-    </div>
+    <main class="col-md-9 col-lg-10 ms-sm-auto px-4 py-4">
+        @RenderBody()
+    </main>
 </div>
 
 @section Scripts {

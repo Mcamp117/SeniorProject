@@ -1,0 +1,461 @@
+@page
+@model EagleConnect.Pages.Admin.Users.EditModel
+@{
+    ViewData["Title"] = "Edit User";
+    Layout = "/Pages/Admin/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-user-edit me-2"></i> Edit User</h2>
+    <a asp-page="/Admin/Users/Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Back to Users
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <!-- Main User Information -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>User Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Input.Id" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    
+                    <!-- Profile Image Upload -->
+                    <div class="mb-4 text-center">
+                        <div class="mb-3">
+                            <img src="@(Model.CurrentProfileImage ?? "/images/default-avatar.svg")" 
+                                 alt="Profile" 
+                                 class="rounded-circle border"
+                                 style="width: 120px; height: 120px; object-fit: cover;"
+                                 id="profilePreview" />
+                        </div>
+                        <div>
+                            <label for="ProfileImageFile" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-camera me-1"></i> Change Photo
+                            </label>
+                            <input type="file" 
+                                   id="ProfileImageFile" 
+                                   name="ProfileImageFile" 
+                                   accept="image/jpeg,image/png,image/gif,image/webp"
+                                   class="d-none"
+                                   onchange="previewImage(this)" />
+                            <p class="text-muted small mt-2 mb-0">Max 5MB. JPG, PNG, GIF, or WebP</p>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <!-- Basic Info -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Input.FirstName" class="form-label"></label>
+                                <input asp-for="Input.FirstName" class="form-control" />
+                                <span asp-validation-for="Input.FirstName" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Input.LastName" class="form-label"></label>
+                                <input asp-for="Input.LastName" class="form-control" />
+                                <span asp-validation-for="Input.LastName" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Input.Email" class="form-label"></label>
+                                <input asp-for="Input.Email" class="form-control" type="email" />
+                                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Input.PhoneNumber" class="form-label"></label>
+                                <input asp-for="Input.PhoneNumber" class="form-control" type="tel" placeholder="(555) 123-4567" />
+                                <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Input.Type" class="form-label"></label>
+                                <select asp-for="Input.Type" class="form-select">
+                                    <option value="Student">Student</option>
+                                    <option value="Alumni">Alumni</option>
+                                    <option value="Faculty">Faculty</option>
+                                    <option value="External">External</option>
+                                </select>
+                                <span asp-validation-for="Input.Type" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Input.GraduationYear" class="form-label"></label>
+                                <input asp-for="Input.GraduationYear" class="form-control" type="number" min="1900" max="2100" />
+                                <span asp-validation-for="Input.GraduationYear" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Input.Company" class="form-label"></label>
+                                <input asp-for="Input.Company" class="form-control" />
+                                <span asp-validation-for="Input.Company" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Input.JobTitle" class="form-label"></label>
+                                <input asp-for="Input.JobTitle" class="form-control" />
+                                <span asp-validation-for="Input.JobTitle" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Bio" class="form-label"></label>
+                        <textarea asp-for="Input.Bio" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Input.Bio" class="text-danger small"></span>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <!-- Account Status -->
+                    <h6 class="mb-3"><i class="fas fa-cog me-2"></i>Account Settings</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mb-3">
+                                <input asp-for="Input.IsApproved" class="form-check-input" type="checkbox" role="switch" />
+                                <label asp-for="Input.IsApproved" class="form-check-label">
+                                    Account Active
+                                </label>
+                                <div class="form-text">User can log in when active</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mb-3">
+                                <input asp-for="Input.EmailConfirmed" class="form-check-input" type="checkbox" role="switch" />
+                                <label asp-for="Input.EmailConfirmed" class="form-check-label">
+                                    Email Confirmed
+                                </label>
+                                <div class="form-text">Manually confirm user's email</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Save Changes
+                        </button>
+                        <a asp-page="/Admin/Users/Index" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Password Reset -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-key me-2"></i>Change Password</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="ResetPassword">
+                    <input type="hidden" name="userId" value="@Model.Input.Id" />
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="PasswordInput.NewPassword" class="form-label"></label>
+                                <input asp-for="PasswordInput.NewPassword" class="form-control" type="password" />
+                                <span asp-validation-for="PasswordInput.NewPassword" class="text-danger small"></span>
+                                <div class="form-text">Minimum 6 characters</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="PasswordInput.ConfirmPassword" class="form-label"></label>
+                                <input asp-for="PasswordInput.ConfirmPassword" class="form-control" type="password" />
+                                <span asp-validation-for="PasswordInput.ConfirmPassword" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-warning" onclick="return confirm('Are you sure you want to change this user\'s password?')">
+                        <i class="fas fa-key me-1"></i> Change Password
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    @if (Model.Input.IsApproved)
+                    {
+                        <form method="post" asp-page-handler="ToggleActivation" class="d-inline">
+                            <input type="hidden" name="userId" value="@Model.Input.Id" />
+                            <input type="hidden" name="activate" value="false" />
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Deactivate this user? They will not be able to log in.')">
+                                <i class="fas fa-user-slash me-1"></i> Deactivate User
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="ToggleActivation" class="d-inline">
+                            <input type="hidden" name="userId" value="@Model.Input.Id" />
+                            <input type="hidden" name="activate" value="true" />
+                            <button type="submit" class="btn btn-outline-success" onclick="return confirm('Activate this user?')">
+                                <i class="fas fa-user-check me-1"></i> Activate User
+                            </button>
+                        </form>
+                    }
+                    
+                    <a asp-page="/Admin/Users/Delete" asp-route-id="@Model.Input.Id" class="btn btn-outline-danger">
+                        <i class="fas fa-trash me-1"></i> Delete User
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar - Skills and Roles -->
+    <div class="col-lg-4">
+        <!-- User Skills -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="fas fa-tools me-2"></i>Skills</h6>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addSkillModal">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                @if (Model.UserSkills.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var userSkill in Model.UserSkills)
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <strong>@userSkill.Skill?.Name</strong>
+                                    <br>
+                                    <small class="text-muted">@userSkill.ProficiencyLevel</small>
+                                    @if (!string.IsNullOrEmpty(userSkill.Notes))
+                                    {
+                                        <br>
+                                        <small class="text-muted">@userSkill.Notes</small>
+                                    }
+                                </div>
+                                <form method="post" asp-page-handler="RemoveSkill" class="d-inline">
+                                    <input type="hidden" name="userId" value="@Model.Input.Id" />
+                                    <input type="hidden" name="skillId" value="@userSkill.SkillId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                            onclick="return confirm('Remove this skill?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted text-center mb-0">No skills assigned</p>
+                }
+            </div>
+        </div>
+
+        <!-- User Roles -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="fas fa-user-shield me-2"></i>Roles</h6>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                @if (Model.UserRoles.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var role in Model.UserRoles)
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span class="badge bg-@(role == "Admin" ? "danger" : "secondary")">@role</span>
+                                <form method="post" asp-page-handler="RemoveRole" class="d-inline">
+                                    <input type="hidden" name="userId" value="@Model.Input.Id" />
+                                    <input type="hidden" name="role" value="@role" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                            onclick="return confirm('Remove this role?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted text-center mb-0">No roles assigned</p>
+                }
+            </div>
+        </div>
+
+        <!-- Account Info -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Account Info</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <small class="text-muted">User ID:</small>
+                    <br>
+                    <code class="small">@Model.Input.Id</code>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Status:</small>
+                    <br>
+                    @if (Model.Input.IsApproved)
+                    {
+                        <span class="badge bg-success"><i class="fas fa-check me-1"></i>Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger"><i class="fas fa-times me-1"></i>Inactive</span>
+                    }
+                </div>
+                <div>
+                    <small class="text-muted">Email Status:</small>
+                    <br>
+                    @if (Model.Input.EmailConfirmed)
+                    {
+                        <span class="badge bg-success"><i class="fas fa-check me-1"></i>Confirmed</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Unconfirmed</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Skill Modal -->
+<div class="modal fade" id="addSkillModal" tabindex="-1" aria-labelledby="addSkillModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addSkillModalLabel">Add Skill</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="AddSkill">
+                <div class="modal-body">
+                    <input type="hidden" name="userId" value="@Model.Input.Id" />
+                    <div class="mb-3">
+                        <label for="skillId" class="form-label">Skill</label>
+                        <select name="skillId" id="skillId" class="form-select" required>
+                            <option value="">Select a skill...</option>
+                            @foreach (var skill in Model.AvailableSkills)
+                            {
+                                <option value="@skill.Id">@skill.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="proficiencyLevel" class="form-label">Proficiency Level</label>
+                        <select name="proficiencyLevel" id="proficiencyLevel" class="form-select" required>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                            <option value="Expert">Expert</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea name="notes" id="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Skill</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Role Modal -->
+<div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRoleModalLabel">Add Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="AddRole">
+                <div class="modal-body">
+                    <input type="hidden" name="userId" value="@Model.Input.Id" />
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select name="role" id="role" class="form-select" required>
+                            <option value="">Select a role...</option>
+                            <option value="Admin">Admin</option>
+                            <option value="User">User</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Role</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePreview').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

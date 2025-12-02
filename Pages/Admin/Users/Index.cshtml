@@ -1,0 +1,255 @@
+@page
+@model EagleConnect.Pages.Admin.Users.IndexModel
+@{
+    ViewData["Title"] = "User Management";
+    Layout = "/Pages/Admin/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-users"></i> User Management</h2>
+                <a asp-page="/Admin/Users/Create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New User
+                </a>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="searchTerm" class="form-label">Search</label>
+                            <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
+                                   value="@Model.SearchTerm" placeholder="Search by name or email...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="userType" class="form-label">User Type</label>
+                            <select class="form-select" id="userType" name="userType">
+                                <option value="">All Types</option>
+                                <option value="Student" selected="@(Model.SelectedUserType == "Student")">Student</option>
+                                <option value="Alumni" selected="@(Model.SelectedUserType == "Alumni")">Alumni</option>
+                                <option value="Faculty" selected="@(Model.SelectedUserType == "Faculty")">Faculty</option>
+                                <option value="External" selected="@(Model.SelectedUserType == "External")">External</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-select" id="role" name="role">
+                                <option value="">All Roles</option>
+                                <option value="Admin" selected="@(Model.SelectedRole == "Admin")">Admin</option>
+                                <option value="User" selected="@(Model.SelectedRole == "User")">User</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="card">
+                <div class="card-body">
+                    @if (Model.Users.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Type</th>
+                                        <th>Role</th>
+                                        <th>Company</th>
+                                        <th>Last Login</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var user in Model.Users)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(user.ProfileImage))
+                                                    {
+                                                        <img src="@user.ProfileImage" alt="@user.FirstName @user.LastName" 
+                                                             class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" 
+                                                             style="width: 32px; height: 32px;">
+                                                            <i class="fas fa-user text-white" style="font-size: 14px;"></i>
+                                                        </div>
+                                                    }
+                                                    <div>
+                                                        <strong>@user.FirstName @user.LastName</strong>
+                                                        @if (!string.IsNullOrEmpty(user.Bio))
+                                                        {
+                                                            <br><small class="text-muted">@(user.Bio.Length > 50 ? user.Bio.Substring(0, 50) + "..." : user.Bio)</small>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>@user.Email</td>
+                                            <td>
+                                                <span class="badge bg-@(user.Type.ToString() switch {
+                                                    "Student" => "primary",
+                                                    "Alumni" => "success", 
+                                                    "Faculty" => "info",
+                                                    "External" => "warning",
+                                                    _ => "secondary"
+                                                })">@user.Type</span>
+                                            </td>
+                                            <td>
+                                                @if (Model.UserRoles.ContainsKey(user.Id))
+                                                {
+                                                    @foreach (var role in Model.UserRoles[user.Id])
+                                                    {
+                                                        <span class="badge bg-@(role == "Admin" ? "danger" : "secondary")">@role</span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">User</span>
+                                                }
+                                            </td>
+                                            <td>@user.Company</td>
+                                            <td>
+                                                @if (user.LastLoginAt.HasValue)
+                                                {
+                                                    <small>@user.LastLoginAt.Value.ToString("MMM dd, yyyy")</small>
+                                                }
+                                                else
+                                                {
+                                                    <small class="text-muted">Never</small>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a asp-page="/Admin/Users/Edit" asp-route-id="@user.Id" 
+                                                       class="btn btn-sm btn-outline-primary" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a asp-page="/Admin/Users/Details" asp-route-id="@user.Id" 
+                                                       class="btn btn-sm btn-outline-info" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                            onclick="confirmDelete('@user.Id', '@user.FirstName @user.LastName')" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (Model.TotalPages > 1)
+                        {
+                            <nav aria-label="User pagination">
+                                <ul class="pagination justify-content-center">
+                                    @if (Model.CurrentPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="?p=@(Model.CurrentPage - 1)@(string.IsNullOrEmpty(Model.SearchTerm) ? "" : "&searchTerm=" + System.Net.WebUtility.UrlEncode(Model.SearchTerm))@(string.IsNullOrEmpty(Model.SelectedUserType) ? "" : "&userType=" + Model.SelectedUserType)@(string.IsNullOrEmpty(Model.SelectedRole) ? "" : "&role=" + Model.SelectedRole)">Previous</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="page-item disabled">
+                                            <span class="page-link">Previous</span>
+                                        </li>
+                                    }
+                                    
+                                    @for (int i = 1; i <= Model.TotalPages; i++)
+                                    {
+                                        var pageNum = i;
+                                        @if (pageNum == Model.CurrentPage)
+                                        {
+                                            <li class="page-item active">
+                                                <span class="page-link">@pageNum</span>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" href="?p=@pageNum@(string.IsNullOrEmpty(Model.SearchTerm) ? "" : "&searchTerm=" + System.Net.WebUtility.UrlEncode(Model.SearchTerm))@(string.IsNullOrEmpty(Model.SelectedUserType) ? "" : "&userType=" + Model.SelectedUserType)@(string.IsNullOrEmpty(Model.SelectedRole) ? "" : "&role=" + Model.SelectedRole)">@pageNum</a>
+                                            </li>
+                                        }
+                                    }
+                                    
+                                    @if (Model.CurrentPage < Model.TotalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="?p=@(Model.CurrentPage + 1)@(string.IsNullOrEmpty(Model.SearchTerm) ? "" : "&searchTerm=" + System.Net.WebUtility.UrlEncode(Model.SearchTerm))@(string.IsNullOrEmpty(Model.SelectedUserType) ? "" : "&userType=" + Model.SelectedUserType)@(string.IsNullOrEmpty(Model.SelectedRole) ? "" : "&role=" + Model.SelectedRole)">Next</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="page-item disabled">
+                                            <span class="page-link">Next</span>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                            <div class="text-center text-muted mt-2">
+                                <small>Page @Model.CurrentPage of @Model.TotalPages (showing @Model.Users.Count users)</small>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No users found</h4>
+                            <p class="text-muted">Try adjusting your search criteria or add a new user.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete user <strong id="userName"></strong>?</p>
+                <p class="text-danger"><small>This action cannot be undone.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" asp-page-handler="Delete" class="d-inline">
+                    <input type="hidden" id="deleteUserId" name="id" value="" />
+                    <button type="submit" class="btn btn-danger">Delete User</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(userId, userName) {
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('deleteUserId').value = userId;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>

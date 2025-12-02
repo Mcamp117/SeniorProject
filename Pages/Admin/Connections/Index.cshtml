@@ -1,0 +1,141 @@
+@page
+@model EagleConnect.Pages.Admin.Connections.IndexModel
+@{
+    ViewData["Title"] = "Connections Management";
+    Layout = "/Pages/Admin/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-friends"></i> Connections Management</h2>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User 1</th>
+                                    <th>User 2</th>
+                                    <th>Requested By</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Accepted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Connections.Any())
+                                {
+                                    @foreach (var conn in Model.Connections)
+                                    {
+                                        <tr>
+                                            <td>@conn.Id</td>
+                                            <td>
+                                                @if (conn.User1 != null)
+                                                {
+                                                    <div>@conn.User1.FirstName @conn.User1.LastName</div>
+                                                    <small class="text-muted">@conn.User1.Email</small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">@conn.User1Id</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (conn.User2 != null)
+                                                {
+                                                    <div>@conn.User2.FirstName @conn.User2.LastName</div>
+                                                    <small class="text-muted">@conn.User2.Email</small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">@conn.User2Id</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (conn.RequestedBy != null)
+                                                {
+                                                    <div>@conn.RequestedBy.FirstName @conn.RequestedBy.LastName</div>
+                                                    <small class="text-muted">@conn.RequestedBy.Email</small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">@conn.RequestedById</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (conn.Status == EagleConnect.Models.ConnectionStatus.Pending)
+                                                {
+                                                    <span class="badge bg-warning">Pending</span>
+                                                }
+                                                else if (conn.Status == EagleConnect.Models.ConnectionStatus.Accepted)
+                                                {
+                                                    <span class="badge bg-success">Accepted</span>
+                                                }
+                                                else if (conn.Status == EagleConnect.Models.ConnectionStatus.Declined)
+                                                {
+                                                    <span class="badge bg-danger">Declined</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@conn.Status</span>
+                                                }
+                                            </td>
+                                            <td>@conn.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                                            <td>
+                                                @if (conn.AcceptedAt.HasValue)
+                                                {
+                                                    @conn.AcceptedAt.Value.ToString("MMM dd, yyyy HH:mm")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (conn.Status == EagleConnect.Models.ConnectionStatus.Pending)
+                                                {
+                                                    <form method="post" asp-page-handler="Accept" asp-route-id="@conn.Id" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-success" title="Accept Connection">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form method="post" asp-page-handler="Decline" asp-route-id="@conn.Id" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-danger" title="Decline Connection">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                                <form method="post" asp-page-handler="Delete" asp-route-id="@conn.Id" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                            onclick="return confirm('Are you sure you want to delete this connection? This will also delete all associated messages.')" 
+                                                            title="Delete Connection">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted py-4">
+                                            No connections found.
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

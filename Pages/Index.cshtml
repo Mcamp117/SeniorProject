@@ -1,0 +1,269 @@
+﻿@page "/home"
+@model IndexModel
+@{
+    ViewData["Title"] = "EagleConnect - Home";
+}
+
+<div class="container">
+    @if (Model.IsLoggedIn)
+    {
+        <!-- Welcome Banner -->
+        <div class="card border-0 mb-4 overflow-hidden" style="background: linear-gradient(135deg, #002856 0%, #001a3d 100%);">
+            <div class="card-body py-4 px-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                    <div class="mb-3 mb-md-0">
+                        <div class="d-flex align-items-center mb-2">
+                            <span style="font-size: 2rem;" class="me-3">🦅</span>
+                            <div>
+                                <h4 class="mb-0 fw-bold text-white">Welcome back, @(Model.CurrentUser?.FirstName ?? User.Identity?.Name)!</h4>
+                                <p class="mb-0 text-white opacity-75">You're connected to the EagleConnect community</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a asp-page="/Posts/Create" class="btn btn-gold">
+                            <i class="fas fa-plus me-1"></i> Create Post
+                        </a>
+                        <a asp-page="/People" class="btn btn-outline-light">
+                            <i class="fas fa-users me-1"></i> Browse People
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Posts Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="h4 fw-bold mb-1">
+                    <i class="fas fa-bullhorn me-2" style="color: #FCB643;"></i> Active Connection Posts
+                </h2>
+                <p class="text-muted mb-0 small">Discover opportunities from the USI community</p>
+            </div>
+            <span class="badge bg-navy px-3 py-2">@Model.ActiveConnectionPosts.Count posts</span>
+        </div>
+
+        <div class="row">
+            @foreach (var post in Model.ActiveConnectionPosts)
+            {
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 connection-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title mb-0">@post.Title</h5>
+                                <div class="d-flex gap-1">
+                                    <span class="badge bg-primary">@post.Type</span>
+                                    <span class="badge bg-success">@post.Seeking</span>
+                                </div>
+                            </div>
+                            
+                            <p class="card-text text-muted mb-3">
+                                <i class="fas fa-map-marker-alt me-1" style="color: #CF102D;"></i> @post.Location
+                            </p>
+                            
+                            <p class="card-text">@post.Description</p>
+                            
+                            @if (!string.IsNullOrEmpty(post.Skills))
+                            {
+                                var skills = post.Skills.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+                                if (skills.Any())
+                                {
+                                    <div class="mb-3">
+                                        <small class="text-muted fw-medium"><i class="fas fa-tags me-1"></i> Skills:</small>
+                                        <div class="mt-1">
+                                            @foreach (var skill in skills.Take(3))
+                                            {
+                                                <span class="badge bg-secondary me-1">@skill</span>
+                                            }
+                                            @if (skills.Count > 3)
+                                            {
+                                                <span class="badge bg-light text-dark">+@(skills.Count - 3) more</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(post.Requirements))
+                            {
+                                var reqs = post.Requirements.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(r => r.Trim()).ToList();
+                                if (reqs.Any())
+                                {
+                                    <div class="mb-3">
+                                        <small class="text-muted fw-medium"><i class="fas fa-list-check me-1"></i> Requirements:</small>
+                                        <ul class="small mb-0 mt-1 ps-3">
+                                            @foreach (var req in reqs.Take(2))
+                                            {
+                                                <li>@req</li>
+                                            }
+                                            @if (reqs.Count > 2)
+                                            {
+                                                <li class="text-muted"><em>+@(reqs.Count - 2) more</em></li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                            }
+                            
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i> Posted @post.PostedDate.ToString("MMM dd")
+                                    @if (post.Deadline.HasValue)
+                                    {
+                                        <span class="ms-2"><i class="fas fa-calendar-alt me-1"></i> Due @post.Deadline.Value.ToString("MMM dd")</span>
+                                    }
+                                </small>
+                                <div class="d-flex gap-2">
+                                    @if (Model.CurrentUser != null && post.PosterId != Model.CurrentUser.Id)
+                                    {
+                                        var isConnected = Model.ConnectionStatuses.ContainsKey(post.PosterId) && Model.ConnectionStatuses[post.PosterId];
+                                        var connection = await Model.GetConnectionIdAsync(post.PosterId);
+                                        @if (isConnected && connection.HasValue)
+                                        {
+                                            <a asp-page="/Connections" asp-route-connectionId="@connection.Value" class="btn btn-success btn-sm">
+                                                <i class="fas fa-comments"></i> Chat
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <form method="post" asp-page="/Connections" asp-page-handler="Connect" class="d-inline">
+                                                <input type="hidden" name="userId" value="@post.PosterId" />
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-user-plus"></i> Connect
+                                                </button>
+                                            </form>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <a href="mailto:@post.ContactInfo" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-envelope me-1"></i> Contact
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (!Model.ActiveConnectionPosts.Any())
+        {
+            <div class="card border-0">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No active posts yet</h5>
+                    <p class="text-muted mb-3">Be the first to create a connection post!</p>
+                    <a asp-page="/Posts/Create" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i> Create Post
+                    </a>
+                </div>
+            </div>
+        }
+
+        <!-- Quick Stats -->
+        <div class="row mt-5 g-4">
+            <div class="col-12">
+                <h3 class="h5 fw-bold mb-3">
+                    <i class="fas fa-chart-bar me-2" style="color: #FCB643;"></i> Community Overview
+                </h3>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card stat-card navy h-100">
+                    <div class="card-body text-center py-4">
+                        <h4 class="mb-1 fw-bold" style="color: #1a1a2e;">@Model.TotalUsers</h4>
+                        <small class="text-muted">Total Members</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card stat-card red h-100">
+                    <div class="card-body text-center py-4">
+                        <h4 class="mb-1 fw-bold" style="color: #b91c1c;">@Model.TotalAlumni</h4>
+                        <small class="text-muted">Alumni</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card stat-card blue h-100">
+                    <div class="card-body text-center py-4">
+                        <h4 class="mb-1 fw-bold" style="color: #0369a1;">@Model.TotalStudents</h4>
+                        <small class="text-muted">Students</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card stat-card gold h-100">
+                    <div class="card-body text-center py-4">
+                        <h4 class="mb-1 fw-bold" style="color: #a16207;">@Model.ActiveRelationships</h4>
+                        <small class="text-muted">Active Connections</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Anonymous User Welcome -->
+        <div class="hero-section py-5 mb-5">
+            <div class="container position-relative" style="z-index: 1;">
+                <div class="row align-items-center py-4">
+                    <div class="col-lg-8">
+                        <h1 class="display-4 fw-bold mb-4 text-white">Welcome to EagleConnect</h1>
+                        <p class="lead mb-4 text-white opacity-75">Connect with alumni, find mentors, and grow your professional network at USI.</p>
+                        <p class="mb-4 text-white opacity-75">Join our community of students, alumni, and professionals to unlock new opportunities.</p>
+                        <div class="d-flex gap-3">
+                            <a class="btn btn-gold btn-lg px-4" asp-page="/Account/Register">
+                                <i class="fas fa-user-plus me-2"></i> Get Started
+                            </a>
+                            <a class="btn btn-outline-light btn-lg px-4" asp-page="/Account/Login">
+                                <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-center d-none d-lg-block">
+                        <span style="font-size: 8rem;">🦅</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features for Anonymous Users -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="feature-icon navy mb-3">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Connect with Alumni</h5>
+                        <p class="card-text text-muted">Find mentors and build professional relationships with successful USI alumni.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="feature-icon red mb-3">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Career Opportunities</h5>
+                        <p class="card-text text-muted">Discover job opportunities, internships, and career guidance from industry professionals.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="feature-icon gold mb-3">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Academic Support</h5>
+                        <p class="card-text text-muted">Get study groups, academic advice, and connect with peers in your field.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

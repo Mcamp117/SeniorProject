@@ -1,0 +1,82 @@
+@page
+@model EagleConnect.Pages.Admin.Organizations.CreateModel
+@{
+    ViewData["Title"] = "Create Organization";
+    Layout = "/Pages/Admin/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Create New Organization</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Organization.Name" class="form-label"></label>
+                            <input asp-for="Organization.Name" class="form-control" />
+                            <span asp-validation-for="Organization.Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Organization.Description" class="form-label"></label>
+                            <textarea asp-for="Organization.Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Organization.Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Organization.Category" class="form-label"></label>
+                            <input asp-for="Organization.Category" class="form-control" />
+                            <span asp-validation-for="Organization.Category" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Organization.ContactEmail" class="form-label"></label>
+                            <input asp-for="Organization.ContactEmail" class="form-control" type="email" />
+                            <span asp-validation-for="Organization.ContactEmail" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Organization.Website" class="form-label"></label>
+                            <input asp-for="Organization.Website" class="form-control" />
+                            <span asp-validation-for="Organization.Website" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Organization.MeetingSchedule" class="form-label"></label>
+                            <input asp-for="Organization.MeetingSchedule" class="form-control" />
+                            <span asp-validation-for="Organization.MeetingSchedule" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Organization.Location" class="form-label"></label>
+                            <input asp-for="Organization.Location" class="form-control" />
+                            <span asp-validation-for="Organization.Location" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input asp-for="Organization.IsActive" class="form-check-input" />
+                            <label asp-for="Organization.IsActive" class="form-check-label">
+                                Active Organization
+                            </label>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create Organization</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

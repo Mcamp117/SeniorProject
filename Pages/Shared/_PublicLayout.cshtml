@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EagleConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #002856 0%, #001a3d 100%);">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" asp-page="/Welcome">
+                    <span class="me-2">🦅</span>
+                    <span>EagleConnect</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavbar" aria-controls="publicNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="publicNavbar">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Welcome">Home</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Account/Login">Sign In</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-sm ms-2" asp-page="/Account/Register" style="background: linear-gradient(135deg, #FCB643 0%, #e09a1f 100%); color: #002856; font-weight: 600; padding: 0.4rem 1rem; border-radius: 20px;">Register</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="flex-grow-1 py-4">
+        <div class="container">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer style="background: linear-gradient(135deg, #001a3d 0%, #002856 100%); border-top: 4px solid; border-image: linear-gradient(90deg, #CF102D 0%, #FCB643 50%, #8ED8F8 100%) 1;">
+        <div class="container py-5">
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <h5 class="text-white fw-bold mb-3">
+                        <span class="me-2">🦅</span>EagleConnect
+                    </h5>
+                    <p class="text-white-50 mb-4">The premier networking platform connecting students, alumni, and professionals at the University of Southern Indiana.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-white-50 fs-5"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-white-50 fs-5"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white-50 fs-5"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-white-50 fs-5"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white fw-bold mb-3 text-uppercase small">Quick Links</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a asp-page="/Welcome" class="text-white-50 text-decoration-none small">Home</a></li>
+                        <li class="mb-2"><a asp-page="/Account/Login" class="text-white-50 text-decoration-none small">Sign In</a></li>
+                        <li class="mb-2"><a asp-page="/Account/Register" class="text-white-50 text-decoration-none small">Register</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white fw-bold mb-3 text-uppercase small">Support</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a asp-page="/Privacy" class="text-white-50 text-decoration-none small">Privacy</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small">Terms</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h6 class="text-white fw-bold mb-3 text-uppercase small">Visit USI</h6>
+                    <p class="text-white-50 small mb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i>8600 University Blvd<br>
+                        <span class="ms-4">Evansville, IN 47712</span>
+                    </p>
+                    <p class="text-white-50 small mb-0">
+                        <i class="fas fa-globe me-2"></i><a href="https://www.usi.edu" class="text-white-50" target="_blank">www.usi.edu</a>
+                    </p>
+                </div>
+            </div>
+            <hr class="my-4 border-secondary opacity-25">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <small class="text-white-50">&copy; 2025 EagleConnect - University of Southern Indiana</small>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <small class="text-white-50">Made with <i class="fas fa-heart text-danger"></i> for USI</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

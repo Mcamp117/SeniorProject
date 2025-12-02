@@ -1,0 +1,197 @@
+@page
+@model EagleConnect.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="py-2">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="fas fa-tachometer-alt me-2" style="color: #FCB643;"></i> Admin Dashboard
+            </h2>
+            <p class="text-muted mb-0">Welcome to the EagleConnect administration panel</p>
+        </div>
+        <span class="badge bg-navy px-3 py-2">
+            <i class="fas fa-shield-alt me-1"></i> Admin Panel
+        </span>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #002856 0%, #003670 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="fw-bold mb-0 text-white">@Model.TotalUsers</h3>
+                            <span class="text-white opacity-75">Total Users</span>
+                        </div>
+                        <div class="text-white opacity-50">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer border-0 bg-transparent py-2">
+                    <a asp-page="/Admin/Users/Index" class="text-white text-decoration-none small">
+                        <i class="fas fa-arrow-right me-1"></i> Manage Users
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #CF102D 0%, #a60d24 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="fw-bold mb-0 text-white">@Model.TotalSkills</h3>
+                            <span class="text-white opacity-75">Skills</span>
+                        </div>
+                        <div class="text-white opacity-50">
+                            <i class="fas fa-tags fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer border-0 bg-transparent py-2">
+                    <a asp-page="/Admin/Skills/Index" class="text-white text-decoration-none small">
+                        <i class="fas fa-arrow-right me-1"></i> Manage Skills
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #0061AB 0%, #8ED8F8 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="fw-bold mb-0 text-white">@Model.ActiveOrganizations</h3>
+                            <span class="text-white opacity-75">Organizations</span>
+                        </div>
+                        <div class="text-white opacity-50">
+                            <i class="fas fa-building fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer border-0 bg-transparent py-2">
+                    <a asp-page="/Admin/Organizations/Index" class="text-white text-decoration-none small">
+                        <i class="fas fa-arrow-right me-1"></i> Manage Organizations
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #FCB643 0%, #e09a1f 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="fw-bold mb-0" style="color: #1a1a2e;">@Model.ActivePosts</h3>
+                            <span style="color: rgba(26,26,46,0.75);">Active Posts</span>
+                        </div>
+                        <div style="color: rgba(26,26,46,0.5);">
+                            <i class="fas fa-bullhorn fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer border-0 bg-transparent py-2">
+                    <a asp-page="/Admin/Posts/Index" class="text-decoration-none small" style="color: #1a1a2e;">
+                        <i class="fas fa-arrow-right me-1"></i> Manage Posts
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fas fa-chart-pie me-2" style="color: #FCB643;"></i> User Breakdown
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center g-3">
+                        <div class="col-4">
+                            <div class="p-3 rounded" style="background: #d4f0fc;">
+                                <h3 class="fw-bold mb-0" style="color: #1a1a2e;">@Model.TotalStudents</h3>
+                                <small class="text-muted">🎓 Students</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 rounded" style="background: rgba(207, 16, 45, 0.1);">
+                                <h3 class="fw-bold mb-0" style="color: #b91c1c;">@Model.TotalAlumni</h3>
+                                <small class="text-muted">🦅 Alumni</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 rounded" style="background: rgba(252, 182, 67, 0.15);">
+                                <h3 class="fw-bold mb-0" style="color: #a16207;">@(Model.TotalUsers - Model.TotalStudents - Model.TotalAlumni)</h3>
+                                <small class="text-muted">👥 Others</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fas fa-chart-bar me-2" style="color: #FCB643;"></i> Content Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center g-3">
+                        <div class="col-6">
+                            <div class="p-3 rounded" style="background: rgba(25, 135, 84, 0.1);">
+                                <h3 class="fw-bold mb-0" style="color: #166534;">@Model.ActivePosts</h3>
+                                <small class="text-muted">Active Posts</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded" style="background: #f0f1f2;">
+                                <h3 class="fw-bold mb-0" style="color: #1a1a2e;">@Model.TotalOrganizations</h3>
+                                <small class="text-muted">Total Organizations</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pt-4 pb-0">
+            <h5 class="fw-bold mb-0">
+                <i class="fas fa-bolt me-2" style="color: #FCB643;"></i> Quick Actions
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-3">
+                    <a asp-page="/Admin/Skills/Create" class="btn btn-outline-primary w-100 py-3">
+                        <i class="fas fa-plus me-2"></i> Add Skill
+                    </a>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <a asp-page="/Admin/Organizations/Create" class="btn btn-outline-success w-100 py-3">
+                        <i class="fas fa-plus me-2"></i> Add Organization
+                    </a>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <a asp-page="/Admin/Posts/Create" class="btn btn-gold w-100 py-3">
+                        <i class="fas fa-plus me-2"></i> Create Post
+                    </a>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <a asp-page="/Admin/Connections/Index" class="btn btn-outline-info w-100 py-3">
+                        <i class="fas fa-user-friends me-2"></i> View Connections
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

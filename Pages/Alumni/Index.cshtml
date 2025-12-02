@@ -1,0 +1,166 @@
+@page
+@using EagleConnect.Models
+@model EagleConnect.Pages.Alumni.NetworkingModel
+@{
+    ViewData["Title"] = "Alumni Directory & Networking";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-primary">Alumni Directory & Networking</h1>
+            <p class="lead">Connect with successful USI alumni who are ready to mentor and guide current students across various industries and companies.</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.Alumni.Count</h3>
+                    <p class="mb-0">Active Alumni</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.ActiveMentorships.Count</h3>
+                    <p class="mb-0">Active Mentorships</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.Industries.Count</h3>
+                    <p class="mb-0">Industries</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3>Networking by Industry</h3>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        @foreach (var industry in Model.Industries)
+        {
+            var industryAlumni = Model.Alumni.Where(a => GetIndustryFromCompany(a.Company) == industry).ToList();
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">@industry</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">@industryAlumni.Count alumni in this industry</p>
+                        <ul class="list-unstyled">
+                            @foreach (var alum in industryAlumni.Take(3))
+                            {
+                                <li class="mb-1">
+                                    <strong>@alum.FirstName @alum.LastName</strong><br>
+                                    <small class="text-muted">@alum.JobTitle at @alum.Company</small>
+                                </li>
+                            }
+                        </ul>
+                        @if (industryAlumni.Count > 3)
+                        {
+                            <small class="text-muted">And @(industryAlumni.Count - 3) more...</small>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h3>All Alumni Network</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var alum in Model.Alumni)
+        {
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img src="@alum.ProfileImage" alt="@alum.FirstName @alum.LastName" class="img-fluid rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            </div>
+                            <div class="col-md-9">
+                                <h5 class="card-title">@alum.FirstName @alum.LastName</h5>
+                                <p class="card-text">
+                                    <strong>@alum.JobTitle</strong> at @alum.Company<br>
+                                    @if (alum.GraduationYear.HasValue)
+                                    {
+                                        <small class="text-muted">Class of @alum.GraduationYear.Value</small>
+                                    }
+                                </p>
+                                @if (!string.IsNullOrEmpty(alum.Bio))
+                                {
+                                    <p class="card-text">@alum.Bio</p>
+                                }
+                                @{ var skillNames = alum.UserSkills.Select(us => us.Skill!.Name).ToList(); }
+                                @if (skillNames.Any())
+                                {
+                                    <div class="mb-2">
+                                        @foreach (var s in skillNames.Take(3))
+                                        {
+                                            <span class="badge bg-secondary me-1">@s</span>
+                                        }
+                                        @if (skillNames.Count > 3)
+                                        {
+                                            <span class="badge bg-light text-dark">+@(skillNames.Count - 3) more</span>
+                                        }
+                                    </div>
+                                }
+                                @if (Model.CurrentUser != null && alum.Id != Model.CurrentUser.Id)
+                                {
+                                    var isConnected = Model.ConnectionStatuses.ContainsKey(alum.Id) && Model.ConnectionStatuses[alum.Id];
+                                    var connection = await Model.GetConnectionIdAsync(alum.Id);
+                                    @if (isConnected && connection.HasValue)
+                                    {
+                                        <a asp-page="/Connections" asp-route-connectionId="@connection.Value" class="btn btn-success btn-sm">
+                                            <i class="fas fa-comments"></i> Chat
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-page="/Connections" asp-page-handler="Connect" class="d-inline">
+                                            <input type="hidden" name="userId" value="@alum.Id" />
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-user-plus"></i> Connect
+                                            </button>
+                                        </form>
+                                    }
+                                }
+                                else
+                                {
+                                    <a href="mailto:@alum.Email" class="btn btn-outline-primary btn-sm">Contact</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    private string GetIndustryFromCompany(string company)
+    {
+        return company.ToLower() switch
+        {
+            var c when c.Contains("microsoft") || c.Contains("tech") => "Technology",
+            var c when c.Contains("procter") || c.Contains("gamble") => "Consumer Goods",
+            var c when c.Contains("hospital") || c.Contains("medical") => "Healthcare",
+            _ => "Other"
+        };
+    }
+}

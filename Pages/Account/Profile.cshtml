@@ -1,0 +1,191 @@
+@page
+@using EagleConnect.Models
+@model EagleConnect.Pages.Account.ProfileModel
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="row g-4">
+        <!-- Main Profile Card -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg overflow-hidden">
+                <!-- Profile Header -->
+                <div class="position-relative" style="height: 120px; background: linear-gradient(135deg, var(--usi-navy) 0%, var(--usi-navy-light) 100%);">
+                    <div class="position-absolute" style="bottom: -50px; left: 30px;">
+                        @if (!string.IsNullOrEmpty(Model.CurrentUser?.ProfileImage))
+                        {
+                            <img src="@Model.CurrentUser.ProfileImage" alt="Profile Image" class="rounded-circle border border-4 border-white shadow" style="width: 100px; height: 100px; object-fit: cover; background: white;">
+                        }
+                        else
+                        {
+                            <div class="avatar-placeholder rounded-circle border border-4 border-white shadow d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--usi-gold) 0%, var(--usi-gold-dark) 100%);">
+                                <i class="fas fa-user fa-2x" style="color: var(--usi-navy);"></i>
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                <div class="card-body pt-5 mt-3">
+                    @if (Model.CurrentUser != null)
+                    {
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <h3 class="fw-bold text-navy mb-1">@Model.CurrentUser.FirstName @Model.CurrentUser.LastName</h3>
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-envelope me-1"></i> @Model.CurrentUser.Email
+                                </p>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    @if (Model.CurrentUser.Type == UserType.Student)
+                                    {
+                                        <span class="badge bg-primary px-3 py-2">🎓 Student</span>
+                                    }
+                                    else if (Model.CurrentUser.Type == UserType.Alumni)
+                                    {
+                                        <span class="badge bg-success px-3 py-2">🦅 Alumni</span>
+                                    }
+                                    else if (Model.CurrentUser.Type == UserType.Faculty)
+                                    {
+                                        <span class="badge bg-info px-3 py-2">👨‍🏫 Faculty</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning px-3 py-2">💼 External</span>
+                                    }
+                                    <span class="badge bg-light text-dark px-3 py-2">
+                                        <i class="fas fa-calendar me-1"></i> Joined @Model.CurrentUser.CreatedAt.ToString("MMMM yyyy")
+                                    </span>
+                                </div>
+                            </div>
+                            <a asp-page="/Account/EditProfile" class="btn btn-gold">
+                                <i class="fas fa-edit me-1"></i> Edit Profile
+                            </a>
+                        </div>
+
+                        <!-- Profile Details -->
+                        <div class="row g-4">
+                            @if (Model.CurrentUser.Type == UserType.Alumni && Model.CurrentUser.GraduationYear.HasValue && Model.CurrentUser.GraduationYear > 0)
+                            {
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center p-3 rounded" style="background: var(--usi-light-blue-soft);">
+                                        <i class="fas fa-graduation-cap fa-lg text-navy me-3"></i>
+                                        <div>
+                                            <small class="text-muted d-block">Graduation Year</small>
+                                            <strong class="text-navy">Class of @Model.CurrentUser.GraduationYear</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.CurrentUser.Company))
+                            {
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center p-3 rounded" style="background: var(--usi-gray-light);">
+                                        <i class="fas fa-building fa-lg text-navy me-3"></i>
+                                        <div>
+                                            <small class="text-muted d-block">Company</small>
+                                            <strong class="text-navy">@Model.CurrentUser.Company</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.CurrentUser.JobTitle))
+                            {
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center p-3 rounded" style="background: var(--usi-gray-light);">
+                                        <i class="fas fa-briefcase fa-lg text-navy me-3"></i>
+                                        <div>
+                                            <small class="text-muted d-block">Job Title</small>
+                                            <strong class="text-navy">@Model.CurrentUser.JobTitle</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.CurrentUser.Bio))
+                        {
+                            <div class="mt-4">
+                                <h5 class="fw-bold text-navy mb-3">
+                                    <i class="fas fa-quote-left text-gold me-2"></i> About Me
+                                </h5>
+                                <p class="text-muted mb-0">@Model.CurrentUser.Bio</p>
+                            </div>
+                        }
+
+                        @if (Model.CurrentUser.UserSkills.Any())
+                        {
+                            <div class="mt-4">
+                                <h5 class="fw-bold text-navy mb-3">
+                                    <i class="fas fa-tags text-gold me-2"></i> Skills
+                                </h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach (var us in Model.CurrentUser.UserSkills)
+                                    {
+                                        <span class="badge bg-secondary px-3 py-2">@us.Skill!.Name</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning border-0">
+                            <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i> Profile Not Found</h5>
+                            <p class="mb-0">Unable to load your profile information. Please try logging in again.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Stats -->
+            <div class="card border-0 shadow mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold text-navy mb-3">
+                        <i class="fas fa-chart-line text-gold me-2"></i> Quick Stats
+                    </h5>
+                    <div class="d-flex justify-content-around text-center">
+                        <div>
+                            <h3 class="text-navy mb-0 fw-bold">0</h3>
+                            <small class="text-muted">Connections</small>
+                        </div>
+                        <div class="border-start border-end px-4">
+                            <h3 class="text-danger mb-0 fw-bold">0</h3>
+                            <small class="text-muted">Posts</small>
+                        </div>
+                        <div>
+                            <h3 class="text-info mb-0 fw-bold">0</h3>
+                            <small class="text-muted">Messages</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Actions -->
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <h5 class="fw-bold text-navy mb-3">
+                        <i class="fas fa-cog text-gold me-2"></i> Account
+                    </h5>
+                    <div class="d-grid gap-2">
+                        <a asp-page="/Account/EditProfile" class="btn btn-outline-primary">
+                            <i class="fas fa-user-edit me-2"></i> Edit Profile
+                        </a>
+                        <a asp-page="/Account/ChangePassword" class="btn btn-outline-secondary">
+                            <i class="fas fa-key me-2"></i> Change Password
+                        </a>
+                        <hr class="my-2">
+                        <a asp-page="/Account/Logout" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i> Sign Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

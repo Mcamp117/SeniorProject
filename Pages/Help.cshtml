@@ -1,0 +1,337 @@
+@page
+@model EagleConnect.Pages.HelpModel
+@{
+    ViewData["Title"] = "Help Center";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <h1 class="fw-bold mb-3">Help Center</h1>
+                <p class="lead text-muted">Find answers to common questions and learn how to make the most of EagleConnect</p>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-3">
+                    <a href="#getting-started" class="card border-0 shadow-sm h-100 text-decoration-none">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon navy mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <h5 class="fw-bold">Getting Started</h5>
+                            <p class="text-muted small mb-0">New to EagleConnect?</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="#profile" class="card border-0 shadow-sm h-100 text-decoration-none">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon red mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h5 class="fw-bold">Profile</h5>
+                            <p class="text-muted small mb-0">Manage your account</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="#connections" class="card border-0 shadow-sm h-100 text-decoration-none">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon gold mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h5 class="fw-bold">Connections</h5>
+                            <p class="text-muted small mb-0">Networking help</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="#troubleshooting" class="card border-0 shadow-sm h-100 text-decoration-none">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon blue mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <h5 class="fw-bold">Troubleshooting</h5>
+                            <p class="text-muted small mb-0">Fix common issues</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Getting Started -->
+            <div id="getting-started" class="mb-5">
+                <h2 class="h3 fw-bold mb-4">
+                    <i class="fas fa-rocket me-2" style="color: #FCB643;"></i> Getting Started
+                </h2>
+                
+                <div class="accordion" id="gettingStartedAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#gs1">
+                                How do I create an EagleConnect account?
+                            </button>
+                        </h3>
+                        <div id="gs1" class="accordion-collapse collapse show" data-bs-parent="#gettingStartedAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Click the <strong>Register</strong> button in the top navigation</li>
+                                    <li>Enter your name, USI email address, and create a password</li>
+                                    <li>Select your user type (Student, Alumni, Faculty, or External)</li>
+                                    <li>Complete your profile information</li>
+                                    <li>Wait for admin approval (you'll receive an email when approved)</li>
+                                </ol>
+                                <p class="mb-0 text-muted"><strong>Note:</strong> All accounts require admin approval to ensure the integrity of our USI community.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#gs2">
+                                What can I do on EagleConnect?
+                            </button>
+                        </h3>
+                        <div id="gs2" class="accordion-collapse collapse" data-bs-parent="#gettingStartedAccordion">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li><strong>Browse People:</strong> Find and connect with students, alumni, faculty, and professionals</li>
+                                    <li><strong>Create Posts:</strong> Share job opportunities, mentorship requests, or collaboration opportunities</li>
+                                    <li><strong>Send Messages:</strong> Communicate directly with your connections</li>
+                                    <li><strong>Join Organizations:</strong> Connect with student organizations and groups</li>
+                                    <li><strong>Find Mentors:</strong> Use our mentorship program to find guidance</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#gs3">
+                                Who can use EagleConnect?
+                            </button>
+                        </h3>
+                        <div id="gs3" class="accordion-collapse collapse" data-bs-parent="#gettingStartedAccordion">
+                            <div class="accordion-body">
+                                <p>EagleConnect is exclusively for the USI community:</p>
+                                <ul>
+                                    <li><strong>Students:</strong> Currently enrolled USI students</li>
+                                    <li><strong>Alumni:</strong> USI graduates from any year</li>
+                                    <li><strong>Faculty:</strong> Current USI faculty and staff</li>
+                                    <li><strong>External:</strong> Approved mentors and employers with USI partnerships</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile -->
+            <div id="profile" class="mb-5">
+                <h2 class="h3 fw-bold mb-4">
+                    <i class="fas fa-user me-2" style="color: #FCB643;"></i> Profile & Account
+                </h2>
+                
+                <div class="accordion" id="profileAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#p1">
+                                How do I edit my profile?
+                            </button>
+                        </h3>
+                        <div id="p1" class="accordion-collapse collapse" data-bs-parent="#profileAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Click on your name in the top-right corner</li>
+                                    <li>Select <strong>Edit Profile</strong> from the dropdown</li>
+                                    <li>Update your information (bio, skills, company, job title)</li>
+                                    <li>Click <strong>Save Changes</strong></li>
+                                </ol>
+                                <p class="mb-0 text-muted"><strong>Tip:</strong> A complete profile with skills and a bio helps others find and connect with you!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#p2">
+                                How do I change my password?
+                            </button>
+                        </h3>
+                        <div id="p2" class="accordion-collapse collapse" data-bs-parent="#profileAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Click on your name in the top-right corner</li>
+                                    <li>Select <strong>Change Password</strong></li>
+                                    <li>Enter your current password</li>
+                                    <li>Enter and confirm your new password</li>
+                                    <li>Click <strong>Update Password</strong></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#p3">
+                                How do I add skills to my profile?
+                            </button>
+                        </h3>
+                        <div id="p3" class="accordion-collapse collapse" data-bs-parent="#profileAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Go to <strong>Edit Profile</strong></li>
+                                    <li>Scroll to the Skills section</li>
+                                    <li>Select skills from the available list</li>
+                                    <li>Save your changes</li>
+                                </ol>
+                                <p class="mb-0 text-muted">Skills help others find you when searching for specific expertise!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connections -->
+            <div id="connections" class="mb-5">
+                <h2 class="h3 fw-bold mb-4">
+                    <i class="fas fa-users me-2" style="color: #FCB643;"></i> Connections & Networking
+                </h2>
+                
+                <div class="accordion" id="connectionsAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#c1">
+                                How do I connect with someone?
+                            </button>
+                        </h3>
+                        <div id="c1" class="accordion-collapse collapse" data-bs-parent="#connectionsAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Browse people using the <strong>People</strong> page or search</li>
+                                    <li>Find someone you'd like to connect with</li>
+                                    <li>Click the <strong>Connect</strong> button on their profile card</li>
+                                    <li>Once connected, you can send messages directly</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#c2">
+                                How do I send a message?
+                            </button>
+                        </h3>
+                        <div id="c2" class="accordion-collapse collapse" data-bs-parent="#connectionsAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Connect with the person first</li>
+                                    <li>Go to <strong>Connections</strong> in the navigation</li>
+                                    <li>Click on the connection you want to message</li>
+                                    <li>Type your message and click <strong>Send</strong></li>
+                                </ol>
+                                <p class="mb-0 text-muted">Messages are real-time - you'll see responses instantly!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#c3">
+                                How do I find a mentor?
+                            </button>
+                        </h3>
+                        <div id="c3" class="accordion-collapse collapse" data-bs-parent="#connectionsAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Go to <strong>Alumni</strong> → <strong>Mentorship Program</strong></li>
+                                    <li>Browse available mentors by field or expertise</li>
+                                    <li>Connect with mentors who match your interests</li>
+                                    <li>Send a message introducing yourself and your goals</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div id="troubleshooting" class="mb-5">
+                <h2 class="h3 fw-bold mb-4">
+                    <i class="fas fa-tools me-2" style="color: #FCB643;"></i> Troubleshooting
+                </h2>
+                
+                <div class="accordion" id="troubleshootingAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#t1">
+                                I forgot my password
+                            </button>
+                        </h3>
+                        <div id="t1" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Go to the <a asp-page="/Account/Login">Sign In</a> page</li>
+                                    <li>Click <strong>Forgot your password?</strong></li>
+                                    <li>Enter your email address</li>
+                                    <li>Check your email for reset instructions</li>
+                                    <li>Click the link and create a new password</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#t2">
+                                My account is not approved yet
+                            </button>
+                        </h3>
+                        <div id="t2" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <p>New accounts require admin approval to verify USI affiliation. This usually takes 1-2 business days. If it's been longer:</p>
+                                <ul>
+                                    <li>Check your spam folder for approval emails</li>
+                                    <li>Make sure you used a valid USI-affiliated email</li>
+                                    <li><a asp-page="/Contact">Contact us</a> if you need assistance</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#t3">
+                                I'm not receiving email notifications
+                            </button>
+                        </h3>
+                        <div id="t3" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li>Check your spam/junk folder</li>
+                                    <li>Add <strong>eagleconnect@usi.edu</strong> to your contacts</li>
+                                    <li>Verify your email address is correct in your profile</li>
+                                    <li>Contact support if issues persist</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Support -->
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #002856 0%, #001a3d 100%);">
+                <div class="card-body text-center p-5">
+                    <h3 class="fw-bold text-white mb-3">Still Need Help?</h3>
+                    <p class="text-white opacity-75 mb-4">Can't find what you're looking for? Our support team is here to help!</p>
+                    <a asp-page="/Contact" class="btn btn-gold btn-lg">
+                        <i class="fas fa-envelope me-2"></i> Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

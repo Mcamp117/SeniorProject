@@ -1,0 +1,148 @@
+@page
+@model EagleConnect.Pages.Posts.IndexModel
+@{
+    ViewData["Title"] = "All Connection Posts";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-bullhorn"></i> All Connection Posts</h2>
+                <a asp-page="Create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create New Post
+                </a>
+            </div>
+
+            @if (Model.AllPosts.Any())
+            {
+                <div class="row">
+                    @foreach (var post in Model.AllPosts)
+                    {
+                        <div class="col-lg-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title mb-1">@post.Title</h5>
+                                        <div>
+                                            <span class="badge bg-primary me-1">@post.Type</span>
+                                            <span class="badge bg-success me-1">@post.Seeking</span>
+                                            @if (post.Status == EagleConnect.Models.PostStatus.Active)
+                                            {
+                                                <span class="badge bg-success">Active</span>
+                                            }
+                                            else if (post.Status == EagleConnect.Models.PostStatus.Closed)
+                                            {
+                                                <span class="badge bg-secondary">Closed</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">Pending</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="card-text text-muted mb-2">
+                                        <i class="fas fa-map-marker-alt me-1"></i>@post.Location
+                                    </p>
+                                    
+                                    <p class="card-text">@post.Description</p>
+                                    
+                                    @if (!string.IsNullOrEmpty(post.Skills))
+                                    {
+                                        var skills = post.Skills.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+                                        if (skills.Any())
+                                        {
+                                            <div class="mb-2">
+                                                <small class="text-muted"><strong>Skills:</strong></small>
+                                                @foreach (var skill in skills.Take(3))
+                                                {
+                                                    <span class="badge bg-secondary me-1">@skill</span>
+                                                }
+                                                @if (skills.Count > 3)
+                                                {
+                                                    <span class="badge bg-light text-dark">+@(skills.Count - 3) more</span>
+                                                }
+                                            </div>
+                                        }
+                                    }
+                                    
+                                    @if (!string.IsNullOrEmpty(post.Requirements))
+                                    {
+                                        var reqs = post.Requirements.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(r => r.Trim()).ToList();
+                                        if (reqs.Any())
+                                        {
+                                            <div class="mb-3">
+                                                <small class="text-muted"><strong>Requirements:</strong></small>
+                                                <ul class="small mb-0 mt-1">
+                                                    @foreach (var req in reqs.Take(2))
+                                                    {
+                                                        <li>@req</li>
+                                                    }
+                                                    @if (reqs.Count > 2)
+                                                    {
+                                                        <li><em>+@(reqs.Count - 2) more requirements</em></li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+                                    }
+                                    
+                                    <div class="mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>Posted by @(post.Poster?.FirstName ?? "Unknown") @(post.Poster?.LastName ?? "")
+                                            <span class="ms-3"><i class="fas fa-clock me-1"></i>@post.PostedDate.ToString("MMM dd, yyyy")</span>
+                                            @if (post.Deadline.HasValue)
+                                            {
+                                                <span class="ms-3"><i class="fas fa-calendar me-1"></i>Deadline @post.Deadline.Value.ToString("MMM dd")</span>
+                                            }
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        @if (Model.CurrentUser != null && post.PosterId != Model.CurrentUser.Id)
+                                        {
+                                            var isConnected = Model.ConnectionStatuses.ContainsKey(post.PosterId) && Model.ConnectionStatuses[post.PosterId];
+                                            var connection = await Model.GetConnectionIdAsync(post.PosterId);
+                                            @if (isConnected && connection.HasValue)
+                                            {
+                                                <a asp-page="/Connections" asp-route-connectionId="@connection.Value" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-comments"></i> Chat
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <form method="post" asp-page="/Connections" asp-page-handler="Connect" class="d-inline">
+                                                    <input type="hidden" name="userId" value="@post.PosterId" />
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-user-plus"></i> Connect
+                                                    </button>
+                                                </form>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <a href="mailto:@post.ContactInfo" class="btn btn-primary btn-sm">Contact</a>
+                                        }
+                                        <button class="btn btn-outline-secondary btn-sm" disabled>Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Posts Yet</h4>
+                    <p class="text-muted">There are no connection posts available yet.</p>
+                    <a asp-page="Create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create the First Post
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

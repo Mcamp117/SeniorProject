@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using EagleConnect.Models;
 using EagleConnect.Services;
 using System.ComponentModel.DataAnnotations;
@@ -15,17 +16,22 @@ namespace EagleConnect.Pages.Account
     {
         private readonly AuthService _authService;
         private readonly IUserService _userService;
+        private readonly ISkillService _skillService;
 
-        public EditProfileModel(AuthService authService, IUserService userService)
+        public EditProfileModel(AuthService authService, IUserService userService, ISkillService skillService)
         {
             _authService = authService;
             _userService = userService;
+            _skillService = skillService;
         }
 
         [BindProperty]
         public InputModel Input { get; set; } = new();
 
         public ApplicationUser? CurrentUser { get; set; }
+        public List<UserSkill> UserSkills { get; set; } = new();
+        public List<Skill> AvailableSkills { get; set; } = new();
+        public SelectList ProficiencyLevels { get; set; } = null!;
 
         public class InputModel
         {
@@ -68,6 +74,27 @@ namespace EagleConnect.Pages.Account
             public string? Bio { get; set; }
         }
 
+        private async Task LoadSkillsData()
+        {
+            if (CurrentUser != null)
+            {
+                UserSkills = await _userService.GetUserSkillsAsync(CurrentUser.Id);
+                var allSkills = await _skillService.GetAllSkillsAsync();
+                
+                // Filter out skills the user already has
+                var userSkillIds = UserSkills.Select(us => us.SkillId).ToHashSet();
+                AvailableSkills = allSkills.Where(s => !userSkillIds.Contains(s.Id)).ToList();
+            }
+
+            ProficiencyLevels = new SelectList(new[]
+            {
+                new { Value = "Beginner", Text = "Beginner" },
+                new { Value = "Intermediate", Text = "Intermediate" },
+                new { Value = "Advanced", Text = "Advanced" },
+                new { Value = "Expert", Text = "Expert" }
+            }, "Value", "Text");
+        }
+
         public async Task<IActionResult> OnGetAsync()
         {
             CurrentUser = await _authService.GetCurrentUserAsync(User);
@@ -86,6 +113,8 @@ namespace EagleConnect.Pages.Account
             Input.GraduationYear = CurrentUser.GraduationYear;
             Input.ProfileImage = string.IsNullOrWhiteSpace(CurrentUser.ProfileImage) ? "/images/default-avatar.svg" : CurrentUser.ProfileImage;
             Input.Bio = string.IsNullOrWhiteSpace(CurrentUser.Bio) ? null : CurrentUser.Bio;
+
+            await LoadSkillsData();
 
             return Page();
         }
@@ -134,6 +163,7 @@ namespace EagleConnect.Pages.Account
             if (!ModelState.IsValid)
             {
                 CurrentUser = await _authService.GetCurrentUserAsync(User);
+                await LoadSkillsData();
                 return Page();
             }
 
@@ -158,7 +188,7 @@ namespace EagleConnect.Pages.Account
                     if (!allowedExtensions.Contains(fileExtension))
                     {
                         ModelState.AddModelError("Input.ProfileImageFile", "Only PNG, JPG, and JPEG files are allowed.");
-                        CurrentUser = await _authService.GetCurrentUserAsync(User);
+                        await LoadSkillsData();
                         return Page();
                     }
 
@@ -167,7 +197,7 @@ namespace EagleConnect.Pages.Account
                     if (Input.ProfileImageFile.Length > maxFileSize)
                     {
                         ModelState.AddModelError("Input.ProfileImageFile", "File size must be less than 5MB.");
-                        CurrentUser = await _authService.GetCurrentUserAsync(User);
+                        await LoadSkillsData();
                         return Page();
                     }
 
@@ -234,9 +264,40 @@ namespace EagleConnect.Pages.Account
             {
                 ModelState.AddModelError("", $"Error updating profile: {ex.Message}");
                 CurrentUser = await _authService.GetCurrentUserAsync(User);
+                await LoadSkillsData();
                 return Page();
             }
         }
+
+        public async Task<IActionResult> OnPostAddSkillAsync(int skillId, string proficiencyLevel)
+        {
+            CurrentUser = await _authService.GetCurrentUserAsync(User);
+            if (CurrentUser == null)
+            {
+                return RedirectToPage("/Account/Login");
+            }
+
+            if (skillId > 0 && !string.IsNullOrEmpty(proficiencyLevel))
+            {
+                await _userService.AddSkillToUserAsync(CurrentUser.Id, skillId, proficiencyLevel);
+                TempData["SuccessMessage"] = "Skill added successfully.";
+            }
+
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostRemoveSkillAsync(int skillId)
+        {
+            CurrentUser = await _authService.GetCurrentUserAsync(User);
+            if (CurrentUser == null)
+            {
+                return RedirectToPage("/Account/Login");
+            }
+
+            await _userService.RemoveSkillFromUserAsync(CurrentUser.Id, skillId);
+            TempData["SuccessMessage"] = "Skill removed successfully.";
+
+            return RedirectToPage();
+        }
     }
 }
-

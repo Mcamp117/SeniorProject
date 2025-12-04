@@ -94,6 +94,20 @@ namespace EagleConnect.Services
         Task<List<Message>> GetUnreadMessagesAsync(string userId);
     }
 
+    public interface IJobOfferService
+    {
+        Task<List<JobOffer>> GetAllJobOffersAsync();
+        Task<JobOffer?> GetJobOfferByIdAsync(int id);
+        Task<List<JobOffer>> GetActiveJobOffersAsync();
+        Task<List<JobOffer>> GetJobOffersByPosterAsync(string posterId);
+        Task<List<JobOffer>> GetJobOffersByCompanyAsync(string companyName);
+        Task<JobOffer> CreateJobOfferAsync(JobOffer jobOffer);
+        Task<JobOffer> UpdateJobOfferAsync(JobOffer jobOffer);
+        Task<bool> DeleteJobOfferAsync(int id);
+        Task<bool> CloseJobOfferAsync(int id);
+        Task UpdateExpiredJobOffersAsync();
+    }
+
     public class SkillService : ISkillService
     {
         private readonly ApplicationDbContext _context;
@@ -897,6 +911,116 @@ namespace EagleConnect.Services
                     (m.Connection!.User1Id == userId || m.Connection.User2Id == userId))
                 .OrderByDescending(m => m.SentAt)
                 .ToListAsync();
+        }
+    }
+
+    public class JobOfferService : IJobOfferService
+    {
+        private readonly ApplicationDbContext _context;
+
+        public JobOfferService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<List<JobOffer>> GetAllJobOffersAsync()
+        {
+            return await _context.JobOffers
+                .Include(j => j.Poster)
+                .OrderByDescending(j => j.PostedDate)
+                .ToListAsync();
+        }
+
+        public async Task<JobOffer?> GetJobOfferByIdAsync(int id)
+        {
+            return await _context.JobOffers
+                .Include(j => j.Poster)
+                .FirstOrDefaultAsync(j => j.Id == id);
+        }
+
+        public async Task<List<JobOffer>> GetActiveJobOffersAsync()
+        {
+            // Update expired job offers first
+            await UpdateExpiredJobOffersAsync();
+            
+            return await _context.JobOffers
+                .Include(j => j.Poster)
+                .Where(j => j.Status == JobOfferStatus.Active && j.ApplicationDeadline >= DateTime.UtcNow)
+                .OrderByDescending(j => j.PostedDate)
+                .ToListAsync();
+        }
+
+        public async Task<List<JobOffer>> GetJobOffersByPosterAsync(string posterId)
+        {
+            return await _context.JobOffers
+                .Include(j => j.Poster)
+                .Where(j => j.PosterId == posterId)
+                .OrderByDescending(j => j.PostedDate)
+                .ToListAsync();
+        }
+
+        public async Task<List<JobOffer>> GetJobOffersByCompanyAsync(string companyName)
+        {
+            return await _context.JobOffers
+                .Include(j => j.Poster)
+                .Where(j => j.CompanyName == companyName || j.Poster!.Company == companyName)
+                .OrderByDescending(j => j.PostedDate)
+                .ToListAsync();
+        }
+
+        public async Task<JobOffer> CreateJobOfferAsync(JobOffer jobOffer)
+        {
+            jobOffer.PostedDate = DateTime.UtcNow;
+            _context.JobOffers.Add(jobOffer);
+            await _context.SaveChangesAsync();
+            return jobOffer;
+        }
+
+        public async Task<JobOffer> UpdateJobOfferAsync(JobOffer jobOffer)
+        {
+            jobOffer.UpdatedAt = DateTime.UtcNow;
+            _context.JobOffers.Update(jobOffer);
+            await _context.SaveChangesAsync();
+            return jobOffer;
+        }
+
+        public async Task<bool> DeleteJobOfferAsync(int id)
+        {
+            var jobOffer = await _context.JobOffers.FindAsync(id);
+            if (jobOffer == null) return false;
+
+            _context.JobOffers.Remove(jobOffer);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> CloseJobOfferAsync(int id)
+        {
+            var jobOffer = await _context.JobOffers.FindAsync(id);
+            if (jobOffer == null) return false;
+
+            jobOffer.Status = JobOfferStatus.Closed;
+            jobOffer.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task UpdateExpiredJobOffersAsync()
+        {
+            var expiredOffers = await _context.JobOffers
+                .Where(j => j.Status == JobOfferStatus.Active && j.ApplicationDeadline < DateTime.UtcNow)
+                .ToListAsync();
+
+            foreach (var offer in expiredOffers)
+            {
+                offer.Status = JobOfferStatus.Expired;
+                offer.UpdatedAt = DateTime.UtcNow;
+            }
+
+            if (expiredOffers.Any())
+            {
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

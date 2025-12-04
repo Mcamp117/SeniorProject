@@ -20,6 +20,7 @@ namespace EagleConnect.Data
         public DbSet<ConnectionPost> ConnectionPosts { get; set; }
         public DbSet<Connection> Connections { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<JobOffer> JobOffers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -185,6 +186,29 @@ namespace EagleConnect.Data
                     
                 entity.HasIndex(e => e.ConnectionId);
                 entity.HasIndex(e => e.SentAt);
+            });
+
+            // Configure JobOffer
+            builder.Entity<JobOffer>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Description).IsRequired().HasMaxLength(3000);
+                entity.Property(e => e.Responsibilities).IsRequired().HasMaxLength(3000);
+                entity.Property(e => e.Link).IsRequired().HasMaxLength(500);
+                entity.Property(e => e.PosterId).IsRequired();
+                entity.Property(e => e.CompanyName).HasMaxLength(100);
+                entity.Property(e => e.Location).HasMaxLength(200);
+                entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
+                
+                entity.HasOne(e => e.Poster)
+                    .WithMany()
+                    .HasForeignKey(e => e.PosterId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                    
+                entity.HasIndex(e => e.PosterId);
+                entity.HasIndex(e => e.Status);
+                entity.HasIndex(e => e.ApplicationDeadline);
             });
 
             // Seed initial data

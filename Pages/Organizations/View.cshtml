@@ -1,0 +1,604 @@
+@page "{id:int}"
+@model EagleConnect.Pages.Organizations.ViewModel
+@{
+    ViewData["Title"] = Model.Organization.Name;
+}
+
+<style>
+    .org-header {
+        background: linear-gradient(135deg, #002856 0%, #001a3d 100%);
+        border-radius: 16px;
+        padding: 2.5rem;
+    }
+    .org-badge {
+        background-color: #FCB643;
+        color: #002856;
+        font-weight: 600;
+    }
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 500px;
+    }
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 12px;
+    }
+    .chat-message {
+        max-width: 75%;
+        margin-bottom: 0.75rem;
+        animation: fadeIn 0.2s ease-in;
+    }
+    .chat-message.sent {
+        margin-left: auto;
+    }
+    .chat-message .bubble {
+        padding: 0.75rem 1rem;
+        border-radius: 16px;
+        position: relative;
+    }
+    .chat-message.sent .bubble {
+        background: linear-gradient(135deg, #002856 0%, #004080 100%);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+    .chat-message.received .bubble {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-bottom-left-radius: 4px;
+    }
+    .chat-input-area {
+        padding: 1rem;
+        background: white;
+        border-top: 1px solid #e9ecef;
+        border-radius: 0 0 12px 12px;
+    }
+    .chat-input {
+        border-radius: 24px;
+        padding: 0.75rem 1.25rem;
+        border: 2px solid #e9ecef;
+        transition: border-color 0.2s;
+    }
+    .chat-input:focus {
+        border-color: #002856;
+        box-shadow: none;
+    }
+    .send-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #002856 0%, #004080 100%);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .send-btn:hover {
+        background: linear-gradient(135deg, #003366 0%, #0055a5 100%);
+    }
+    .post-card {
+        border-radius: 12px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .post-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .member-card {
+        border-radius: 12px;
+        transition: all 0.2s;
+    }
+    .member-card:hover {
+        background-color: #f8f9fa;
+    }
+    .section-card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .section-header {
+        background: transparent;
+        border-bottom: 1px solid #e9ecef;
+        padding: 1.25rem 1.5rem;
+    }
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Organizations" class="text-decoration-none">Organizations</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Organization.Name</li>
+        </ol>
+    </nav>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Organization Header -->
+    <div class="org-header mb-5">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-white rounded-circle p-3 me-3" style="width: 64px; height: 64px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-users fa-lg text-primary"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-white fw-bold mb-0" style="font-size: 2rem;">@Model.Organization.Name</h1>
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            <span class="badge org-badge">
+                                <i class="fas fa-tag me-1"></i>@Model.Organization.Category
+                            </span>
+                            <span class="badge bg-white text-dark">
+                                <i class="fas fa-users me-1"></i>@Model.Members.Count members
+                            </span>
+                            @if (Model.IsModerator)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="fas fa-shield-alt me-1"></i>Moderator
+                                </span>
+                            }
+                            else if (Model.IsMember)
+                            {
+                                <span class="badge bg-info">
+                                    <i class="fas fa-check-circle me-1"></i>Member
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <p class="text-white-50 mb-4" style="font-size: 1.1rem;">@Model.Organization.Description</p>
+                <div class="d-flex flex-wrap gap-4 text-white-50">
+                    @if (!string.IsNullOrEmpty(Model.Organization.MeetingSchedule))
+                    {
+                        <span><i class="fas fa-clock me-2"></i>@Model.Organization.MeetingSchedule</span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Organization.Location))
+                    {
+                        <span><i class="fas fa-map-marker-alt me-2"></i>@Model.Organization.Location</span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Organization.ContactEmail))
+                    {
+                        <span><i class="fas fa-envelope me-2"></i>@Model.Organization.ContactEmail</span>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                @if (Model.IsModerator)
+                {
+                    <a asp-page="/Organizations/Manage" asp-route-id="@Model.Organization.Id" class="btn btn-warning btn-lg px-4">
+                        <i class="fas fa-cog me-2"></i>Manage Organization
+                    </a>
+                }
+                else if (!Model.IsMember && !Model.HasPendingRequest)
+                {
+                    <button type="button" class="btn btn-light btn-lg px-4" data-bs-toggle="modal" data-bs-target="#joinModal">
+                        <i class="fas fa-user-plus me-2"></i>Request to Join
+                    </button>
+                }
+                else if (Model.HasPendingRequest)
+                {
+                    <button type="button" class="btn btn-outline-light btn-lg px-4" disabled>
+                        <i class="fas fa-hourglass-half me-2"></i>Request Pending
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (Model.IsMember || Model.IsModerator)
+    {
+        <!-- Main Content Area -->
+        <div class="row g-4">
+            <!-- Posts Section -->
+            <div class="col-lg-7">
+                <div class="card section-card h-100">
+                    <div class="section-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-bullhorn me-2 text-primary"></i>Announcements & Posts
+                        </h5>
+                        @if (Model.IsModerator)
+                        {
+                            <a asp-page="/Organizations/CreatePost" asp-route-id="@Model.Organization.Id" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i>New Post
+                            </a>
+                        }
+                    </div>
+                    <div class="card-body p-4" style="max-height: 550px; overflow-y: auto;">
+                        @if (Model.Posts.Any())
+                        {
+                            @foreach (var post in Model.Posts)
+                            {
+                                <div class="post-card p-4 mb-3 @(post.IsPinned ? "bg-warning bg-opacity-10 border border-warning" : "bg-light")">
+                                    @if (post.IsPinned)
+                                    {
+                                        <div class="mb-2">
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-thumbtack me-1"></i>Pinned
+                                            </span>
+                                        </div>
+                                    }
+                                    <h5 class="fw-bold mb-2">@post.Title</h5>
+                                    <div class="d-flex align-items-center text-muted small mb-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 28px; height: 28px;">
+                                            <i class="fas fa-user" style="font-size: 0.65rem;"></i>
+                                        </div>
+                                        <span>@post.Author?.FirstName @post.Author?.LastName</span>
+                                        <span class="mx-2">•</span>
+                                        <span>@post.CreatedAt.ToString("MMM d, yyyy 'at' h:mm tt")</span>
+                                    </div>
+                                    <p class="mb-0 text-dark" style="white-space: pre-line; line-height: 1.6;">@post.Content</p>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-inbox fa-2x text-muted"></i>
+                                </div>
+                                <h6 class="text-muted">No posts yet</h6>
+                                <p class="text-muted small mb-3">Be the first to share something with the organization!</p>
+                                @if (Model.IsModerator)
+                                {
+                                    <a asp-page="/Organizations/CreatePost" asp-route-id="@Model.Organization.Id" class="btn btn-primary">
+                                        <i class="fas fa-plus me-1"></i>Create First Post
+                                    </a>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Section -->
+            <div class="col-lg-5">
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-comments me-2 text-primary"></i>Group Chat
+                            <span class="badge bg-success ms-2" id="connectionStatus" style="font-size: 0.65rem;">Connecting...</span>
+                        </h5>
+                    </div>
+                    <div class="chat-container">
+                        <div id="chatMessages" class="chat-messages">
+                            @if (!Model.Messages.Any())
+                            {
+                                <div class="text-center py-4" id="emptyState">
+                                    <i class="fas fa-comments fa-2x text-muted mb-2"></i>
+                                    <p class="text-muted small mb-0">No messages yet. Start the conversation!</p>
+                                </div>
+                            }
+                            @foreach (var message in Model.Messages)
+                            {
+                                var isCurrentUser = message.SenderId == Model.CurrentUser.Id;
+                                <div class="chat-message @(isCurrentUser ? "sent" : "received")">
+                                    <div class="bubble">
+                                        @if (!isCurrentUser)
+                                        {
+                                            <div class="fw-bold small text-primary mb-1">@message.Sender?.FirstName @message.Sender?.LastName</div>
+                                        }
+                                        <div>@message.Content</div>
+                                        <div class="@(isCurrentUser ? "text-white-50" : "text-muted") mt-1" style="font-size: 0.7rem;">
+                                            @message.SentAt.ToString("h:mm tt")
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="chat-input-area">
+                            <div id="typingIndicator" class="text-muted small mb-2" style="display: none;">
+                                <i class="fas fa-circle-notch fa-spin me-1"></i>Someone is typing...
+                            </div>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="messageInput" class="form-control chat-input" placeholder="Type your message..." maxlength="2000">
+                                <button type="button" id="sendButton" class="btn send-btn text-white">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members Section -->
+        <div class="card section-card mt-4">
+            <div class="section-header">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-users me-2 text-primary"></i>Members
+                    <span class="badge bg-primary ms-2">@Model.Members.Count</span>
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    @if (Model.Organization.Moderator != null)
+                    {
+                        <div class="col-xl-3 col-lg-4 col-md-6">
+                            <div class="member-card d-flex align-items-center p-3 border rounded-3 bg-warning bg-opacity-10">
+                                <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; flex-shrink: 0;">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <div class="fw-bold text-truncate">@Model.Organization.Moderator.FirstName @Model.Organization.Moderator.LastName</div>
+                                    <small class="text-warning fw-semibold">Moderator</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @foreach (var member in Model.Members.Where(m => m.UserId != Model.Organization.ModeratorId))
+                    {
+                        <div class="col-xl-3 col-lg-4 col-md-6">
+                            <div class="member-card d-flex align-items-center p-3 border rounded-3">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; flex-shrink: 0;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <div class="fw-bold text-truncate">@member.User?.FirstName @member.User?.LastName</div>
+                                    <small class="text-muted">@member.Role</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Non-member view -->
+        <div class="card section-card">
+            <div class="card-body text-center py-5">
+                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                    <i class="fas fa-lock fa-2x text-muted"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Members Only Content</h4>
+                <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">
+                    Join this organization to access exclusive posts, group chat, and connect with other members.
+                </p>
+                @if (!Model.HasPendingRequest)
+                {
+                    <button type="button" class="btn btn-primary btn-lg px-5" data-bs-toggle="modal" data-bs-target="#joinModal">
+                        <i class="fas fa-user-plus me-2"></i>Request to Join
+                    </button>
+                }
+                else
+                {
+                    <div class="alert alert-info d-inline-flex align-items-center px-4">
+                        <i class="fas fa-hourglass-half me-2"></i>Your join request is pending approval from the moderator.
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Join Request Modal -->
+<div class="modal fade" id="joinModal" tabindex="-1" aria-labelledby="joinModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="joinModalLabel">
+                    <i class="fas fa-user-plus me-2 text-primary"></i>Join @Model.Organization.Name
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="RequestJoin" asp-route-id="@Model.Organization.Id">
+                <div class="modal-body">
+                    <p class="text-muted">
+                        Your request will be reviewed by the organization moderator. You'll gain access once approved.
+                    </p>
+                    <div class="mb-3">
+                        <label for="joinMessage" class="form-label fw-semibold">Message (Optional)</label>
+                        <textarea name="message" id="joinMessage" class="form-control" rows="3" 
+                            placeholder="Tell the moderator why you'd like to join..." style="border-radius: 12px;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@if (Model.IsMember || Model.IsModerator)
+{
+    @section Scripts {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+        <script>
+            const organizationId = @Model.Organization.Id;
+            const currentUserId = '@Model.CurrentUser.Id';
+            const currentUserName = '@Html.Raw((Model.CurrentUser.FirstName + " " + Model.CurrentUser.LastName).Replace("'", "\\'"))';
+            
+            const statusBadge = document.getElementById('connectionStatus');
+            const chatMessages = document.getElementById('chatMessages');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const emptyState = document.getElementById('emptyState');
+            
+            // SignalR connection
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/chathub")
+                .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+                .configureLogging(signalR.LogLevel.Information)
+                .build();
+
+            // Connection state handlers
+            connection.onreconnecting(() => {
+                statusBadge.textContent = 'Reconnecting...';
+                statusBadge.className = 'badge bg-warning ms-2';
+                statusBadge.style.fontSize = '0.65rem';
+            });
+
+            connection.onreconnected(() => {
+                statusBadge.textContent = 'Connected';
+                statusBadge.className = 'badge bg-success ms-2';
+                statusBadge.style.fontSize = '0.65rem';
+                connection.invoke("JoinOrganization", organizationId).catch(err => console.error(err));
+            });
+
+            connection.onclose(() => {
+                statusBadge.textContent = 'Disconnected';
+                statusBadge.className = 'badge bg-danger ms-2';
+                statusBadge.style.fontSize = '0.65rem';
+            });
+
+            // Receive organization message
+            connection.on("ReceiveOrganizationMessage", function (message) {
+                if (emptyState) {
+                    emptyState.remove();
+                }
+                appendMessage(message);
+                scrollToBottom();
+            });
+
+            // Typing indicator
+            connection.on("UserTypingInOrganization", function (data) {
+                if (data.organizationId === organizationId && data.userId !== currentUserId) {
+                    showTypingIndicator();
+                }
+            });
+
+            // Error handler
+            connection.on("Error", function (error) {
+                console.error("SignalR Error:", error);
+            });
+
+            // Start connection and join organization group
+            async function startConnection() {
+                try {
+                    await connection.start();
+                    console.log("SignalR Connected");
+                    statusBadge.textContent = 'Connected';
+                    statusBadge.className = 'badge bg-success ms-2';
+                    statusBadge.style.fontSize = '0.65rem';
+                    
+                    await connection.invoke("JoinOrganization", organizationId);
+                    console.log("Joined organization group:", organizationId);
+                } catch (err) {
+                    console.error("SignalR Connection Error:", err);
+                    statusBadge.textContent = 'Connection Failed';
+                    statusBadge.className = 'badge bg-danger ms-2';
+                    statusBadge.style.fontSize = '0.65rem';
+                    
+                    // Retry after 5 seconds
+                    setTimeout(startConnection, 5000);
+                }
+            }
+            
+            startConnection();
+
+            // Send message
+            sendButton.addEventListener("click", sendMessage);
+            messageInput.addEventListener("keypress", function (e) {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Typing notification
+            let typingDebounce;
+            messageInput.addEventListener("input", function () {
+                clearTimeout(typingDebounce);
+                typingDebounce = setTimeout(() => {
+                    if (connection.state === signalR.HubConnectionState.Connected) {
+                        connection.invoke("NotifyTypingInOrganization", organizationId).catch(err => console.error(err));
+                    }
+                }, 300);
+            });
+
+            async function sendMessage() {
+                const message = messageInput.value.trim();
+                
+                if (!message) return;
+                
+                if (connection.state !== signalR.HubConnectionState.Connected) {
+                    alert("Not connected to chat. Please wait...");
+                    return;
+                }
+
+                try {
+                    sendButton.disabled = true;
+                    await connection.invoke("SendOrganizationMessage", organizationId, message);
+                    messageInput.value = "";
+                } catch (err) {
+                    console.error("Send Error:", err);
+                    alert("Failed to send message. Please try again.");
+                } finally {
+                    sendButton.disabled = false;
+                    messageInput.focus();
+                }
+            }
+
+            function appendMessage(message) {
+                const isCurrentUser = message.senderId === currentUserId;
+                
+                const messageDiv = document.createElement("div");
+                messageDiv.className = `chat-message ${isCurrentUser ? "sent" : "received"}`;
+                
+                const time = new Date(message.sentAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+                
+                messageDiv.innerHTML = `
+                    <div class="bubble">
+                        ${!isCurrentUser ? `<div class="fw-bold small text-primary mb-1">${escapeHtml(message.senderName)}</div>` : ""}
+                        <div>${escapeHtml(message.content)}</div>
+                        <div class="${isCurrentUser ? "text-white-50" : "text-muted"} mt-1" style="font-size: 0.7rem;">
+                            ${time}
+                        </div>
+                    </div>
+                `;
+                
+                chatMessages.appendChild(messageDiv);
+            }
+
+            function scrollToBottom() {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            let typingTimeout;
+            function showTypingIndicator() {
+                typingIndicator.style.display = "block";
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    typingIndicator.style.display = "none";
+                }, 2000);
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement("div");
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Scroll to bottom on load
+            document.addEventListener("DOMContentLoaded", function () {
+                scrollToBottom();
+            });
+
+            // Clean up on page unload
+            window.addEventListener("beforeunload", function () {
+                if (connection.state === signalR.HubConnectionState.Connected) {
+                    connection.invoke("LeaveOrganization", organizationId).catch(() => {});
+                }
+            });
+        </script>
+    }
+}

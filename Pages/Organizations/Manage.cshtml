@@ -1,0 +1,356 @@
+@page "{id:int}"
+@model EagleConnect.Pages.Organizations.ManageModel
+@{
+    ViewData["Title"] = "Manage " + Model.Organization.Name;
+}
+
+<style>
+    .manage-header {
+        background: linear-gradient(135deg, #002856 0%, #001a3d 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+    }
+    .stat-card {
+        border-radius: 16px;
+        border: none;
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    .section-card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .section-header {
+        border-radius: 16px 16px 0 0;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .request-card {
+        border-radius: 12px;
+        transition: all 0.2s;
+    }
+    .request-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .member-row {
+        transition: background-color 0.2s;
+        border-radius: 8px;
+    }
+    .member-row:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Organizations" class="text-decoration-none">Organizations</a></li>
+            <li class="breadcrumb-item"><a asp-page="/Organizations/View" asp-route-id="@Model.Organization.Id" class="text-decoration-none">@Model.Organization.Name</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Manage</li>
+        </ol>
+    </nav>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Page Header -->
+    <div class="manage-header mb-5">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-warning rounded-circle p-3 me-3" style="width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-cog fa-lg text-dark"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-white fw-bold mb-0">Manage Organization</h1>
+                        <p class="text-white-50 mb-0">@Model.Organization.Name</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <a asp-page="/Organizations/View" asp-route-id="@Model.Organization.Id" class="btn btn-light btn-lg">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Organization
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card stat-card h-100" style="background: linear-gradient(135deg, #FCB643 0%, #e09a1f 100%);">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="rounded-circle bg-white bg-opacity-25 p-3 me-3">
+                        <i class="fas fa-user-clock fa-lg text-dark"></i>
+                    </div>
+                    <div>
+                        <h2 class="mb-0 fw-bold text-dark">@Model.PendingRequests.Count</h2>
+                        <small class="text-dark text-opacity-75">Pending Requests</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card bg-success text-white h-100">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="rounded-circle bg-white bg-opacity-25 p-3 me-3">
+                        <i class="fas fa-users fa-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="mb-0 fw-bold">@Model.Members.Count</h2>
+                        <small class="text-white-50">Active Members</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card bg-info text-white h-100">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="rounded-circle bg-white bg-opacity-25 p-3 me-3">
+                        <i class="fas fa-bullhorn fa-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="mb-0 fw-bold">@Model.Posts.Count</h2>
+                        <small class="text-white-50">Total Posts</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Pending Requests -->
+        <div class="col-lg-6">
+            <div class="card section-card h-100">
+                <div class="section-header text-white" style="background: linear-gradient(135deg, #FCB643 0%, #e09a1f 100%);">
+                    <h5 class="mb-0 fw-bold text-dark">
+                        <i class="fas fa-user-clock me-2"></i>Pending Requests
+                        @if (Model.PendingRequests.Any())
+                        {
+                            <span class="badge bg-dark ms-2">@Model.PendingRequests.Count</span>
+                        }
+                    </h5>
+                </div>
+                <div class="card-body p-4" style="max-height: 500px; overflow-y: auto;">
+                    @if (Model.PendingRequests.Any())
+                    {
+                        @foreach (var request in Model.PendingRequests)
+                        {
+                            <div class="request-card border p-4 mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; flex-shrink: 0;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 fw-bold">@request.User?.FirstName @request.User?.LastName</h6>
+                                        <small class="text-muted d-block">@request.User?.Email</small>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>@request.RequestedAt.ToString("MMM d, yyyy 'at' h:mm tt")
+                                        </small>
+                                        @if (!string.IsNullOrEmpty(request.Message))
+                                        {
+                                            <div class="mt-2 p-3 bg-light rounded">
+                                                <small class="text-muted fst-italic">"@request.Message"</small>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="mt-3 pt-3 border-top d-flex gap-2">
+                                    <form method="post" asp-page-handler="ApproveRequest" asp-route-id="@Model.Organization.Id" asp-route-requestId="@request.Id" class="flex-grow-1">
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <i class="fas fa-check me-1"></i>Approve
+                                        </button>
+                                    </form>
+                                    <button type="button" class="btn btn-outline-danger flex-grow-1" data-bs-toggle="modal" data-bs-target="#rejectModal-@request.Id">
+                                        <i class="fas fa-times me-1"></i>Reject
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Reject Modal -->
+                            <div class="modal fade" id="rejectModal-@request.Id" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content" style="border-radius: 16px; border: none;">
+                                        <div class="modal-header border-0">
+                                            <h5 class="modal-title fw-bold">Reject Request</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form method="post" asp-page-handler="RejectRequest" asp-route-id="@Model.Organization.Id" asp-route-requestId="@request.Id">
+                                            <div class="modal-body">
+                                                <p>Reject the membership request from <strong>@request.User?.FirstName @request.User?.LastName</strong>?</p>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Reason (Optional)</label>
+                                                    <textarea name="reason" class="form-control" rows="2" placeholder="Provide a reason..." style="border-radius: 12px;"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-danger">Reject Request</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                            </div>
+                            <p class="text-muted mb-0">No pending requests</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Members -->
+        <div class="col-lg-6">
+            <div class="card section-card h-100">
+                <div class="section-header bg-success text-white">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-users me-2"></i>Members
+                        <span class="badge bg-white text-success ms-2">@Model.Members.Count</span>
+                    </h5>
+                </div>
+                <div class="card-body p-4" style="max-height: 500px; overflow-y: auto;">
+                    @foreach (var member in Model.Members)
+                    {
+                        var isModerator = member.UserId == Model.Organization.ModeratorId;
+                        <div class="member-row d-flex justify-content-between align-items-center p-3 mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle @(isModerator ? "bg-warning" : "bg-primary") text-white d-flex align-items-center justify-content-center me-3" style="width: 44px; height: 44px;">
+                                    <i class="fas @(isModerator ? "fa-shield-alt" : "fa-user")"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">
+                                        @member.User?.FirstName @member.User?.LastName
+                                        @if (isModerator)
+                                        {
+                                            <span class="badge bg-warning text-dark ms-1">Moderator</span>
+                                        }
+                                    </div>
+                                    <small class="text-muted">Joined @member.JoinedDate.ToString("MMM d, yyyy")</small>
+                                </div>
+                            </div>
+                            @if (!isModerator)
+                            {
+                                <form method="post" asp-page-handler="RemoveMember" asp-route-id="@Model.Organization.Id" asp-route-userId="@member.UserId" 
+                                      onsubmit="return confirm('Remove this member from the organization?');">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-user-minus"></i>
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posts Management -->
+    <div class="card section-card mt-4">
+        <div class="section-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">
+                <i class="fas fa-bullhorn me-2"></i>Posts
+                <span class="badge bg-white text-info ms-2">@Model.Posts.Count</span>
+            </h5>
+            <a asp-page="/Organizations/CreatePost" asp-route-id="@Model.Organization.Id" class="btn btn-light btn-sm">
+                <i class="fas fa-plus me-1"></i>New Post
+            </a>
+        </div>
+        <div class="card-body p-4">
+            @if (Model.Posts.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var post in Model.Posts)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if (post.IsPinned)
+                                            {
+                                                <i class="fas fa-thumbtack text-warning me-2"></i>
+                                            }
+                                            <span class="fw-semibold">@post.Title</span>
+                                        </div>
+                                    </td>
+                                    <td>@post.Author?.FirstName @post.Author?.LastName</td>
+                                    <td>@post.CreatedAt.ToString("MMM d, yyyy")</td>
+                                    <td>
+                                        @if (post.IsPinned)
+                                        {
+                                            <span class="badge bg-warning text-dark">Pinned</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-dark">Regular</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <form method="post" asp-page-handler="TogglePin" asp-route-id="@Model.Organization.Id" asp-route-postId="@post.Id" class="d-inline">
+                                                <button type="submit" class="btn @(post.IsPinned ? "btn-warning" : "btn-outline-warning")" title="@(post.IsPinned ? "Unpin" : "Pin")">
+                                                    <i class="fas fa-thumbtack"></i>
+                                                </button>
+                                            </form>
+                                            <form method="post" asp-page-handler="DeletePost" asp-route-id="@Model.Organization.Id" asp-route-postId="@post.Id" class="d-inline"
+                                                  onsubmit="return confirm('Delete this post?');">
+                                                <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                        <i class="fas fa-bullhorn fa-2x text-muted"></i>
+                    </div>
+                    <p class="text-muted mb-3">No posts yet</p>
+                    <a asp-page="/Organizations/CreatePost" asp-route-id="@Model.Organization.Id" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Create First Post
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

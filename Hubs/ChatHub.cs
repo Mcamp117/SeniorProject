@@ -10,13 +10,20 @@ namespace EagleConnect.Hubs
     {
         private readonly IMessageService _messageService;
         private readonly IConnectionService _connectionService;
+        private readonly IStudentOrganizationService _organizationService;
 
-        public ChatHub(IMessageService messageService, IConnectionService connectionService)
+        public ChatHub(
+            IMessageService messageService, 
+            IConnectionService connectionService,
+            IStudentOrganizationService organizationService)
         {
             _messageService = messageService;
             _connectionService = connectionService;
+            _organizationService = organizationService;
         }
 
+        // ===== Direct Message Methods =====
+        
         public async Task SendMessage(int connectionId, string content)
         {
             var userId = Context.UserIdentifier;
@@ -95,6 +102,97 @@ namespace EagleConnect.Hubs
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"connection_{connectionId}");
         }
 
+        // ===== Organization Group Chat Methods =====
+
+        public async Task SendOrganizationMessage(int organizationId, string content)
+        {
+            var userId = Context.UserIdentifier;
+            if (string.IsNullOrEmpty(userId))
+            {
+                await Clients.Caller.SendAsync("Error", "User not authenticated");
+                return;
+            }
+
+            // Verify user is a member of the organization
+            var isMember = await _organizationService.IsMemberAsync(organizationId, userId);
+            var isModerator = await _organizationService.IsModeratorAsync(organizationId, userId);
+            
+            if (!isMember && !isModerator)
+            {
+                await Clients.Caller.SendAsync("Error", "You are not a member of this organization");
+                return;
+            }
+
+            // Save message to database
+            var message = await _organizationService.SendMessageAsync(organizationId, userId, content);
+
+            // Send to all members in the organization group
+            await Clients.Group($"organization_{organizationId}").SendAsync("ReceiveOrganizationMessage", new
+            {
+                id = message.Id,
+                organizationId = message.OrganizationId,
+                senderId = message.SenderId,
+                senderName = message.Sender?.FirstName + " " + message.Sender?.LastName,
+                content = message.Content,
+                sentAt = message.SentAt
+            });
+        }
+
+        public async Task JoinOrganization(int organizationId)
+        {
+            var userId = Context.UserIdentifier;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return;
+            }
+
+            // Verify user is a member of the organization
+            var isMember = await _organizationService.IsMemberAsync(organizationId, userId);
+            var isModerator = await _organizationService.IsModeratorAsync(organizationId, userId);
+            
+            if (isMember || isModerator)
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, $"organization_{organizationId}");
+                
+                // Notify others that user joined (optional)
+                await Clients.OthersInGroup($"organization_{organizationId}").SendAsync("UserJoinedOrganizationChat", new
+                {
+                    organizationId,
+                    userId
+                });
+            }
+        }
+
+        public async Task LeaveOrganization(int organizationId)
+        {
+            var userId = Context.UserIdentifier;
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"organization_{organizationId}");
+            
+            // Notify others that user left (optional)
+            await Clients.OthersInGroup($"organization_{organizationId}").SendAsync("UserLeftOrganizationChat", new
+            {
+                organizationId,
+                userId
+            });
+        }
+
+        public async Task NotifyTypingInOrganization(int organizationId)
+        {
+            var userId = Context.UserIdentifier;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return;
+            }
+
+            await Clients.OthersInGroup($"organization_{organizationId}").SendAsync("UserTypingInOrganization", new
+            {
+                organizationId,
+                userId
+            });
+        }
+
+        // ===== Connection Lifecycle =====
+
         public override async Task OnConnectedAsync()
         {
             var userId = Context.UserIdentifier;
@@ -116,4 +214,3 @@ namespace EagleConnect.Hubs
         }
     }
 }
-

@@ -1,7 +1,7 @@
-@page
-@model EagleConnect.Pages.Admin.Organizations.CreateModel
+@page "{id:int}"
+@model EagleConnect.Pages.Admin.Organizations.EditModel
 @{
-    ViewData["Title"] = "Create Organization";
+    ViewData["Title"] = "Edit Organization";
     Layout = "/Pages/Admin/_Layout.cshtml";
 }
 
@@ -10,7 +10,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h4><i class="fas fa-plus-circle me-2"></i>Create New Organization</h4>
+                    <h4><i class="fas fa-edit me-2"></i>Edit Organization: @Model.Organization.Name</h4>
                 </div>
                 <div class="card-body">
                     <form method="post">
@@ -38,8 +38,16 @@
                             <label asp-for="SelectedModeratorId" class="form-label">
                                 <i class="fas fa-shield-alt me-1 text-warning"></i>Moderator
                             </label>
+                            @if (!string.IsNullOrEmpty(Model.CurrentModeratorName))
+                            {
+                                <div class="mb-2">
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-user me-1"></i>Current: @Model.CurrentModeratorName
+                                    </span>
+                                </div>
+                            }
                             <select asp-for="SelectedModeratorId" asp-items="@Model.UserList" class="form-select">
-                                <option value="">-- Select a Moderator --</option>
+                                <option value="">-- No Moderator --</option>
                             </select>
                             <small class="text-muted">The moderator can manage membership requests, create posts, and manage members.</small>
                         </div>
@@ -80,7 +88,7 @@
                                 <i class="fas fa-arrow-left me-1"></i>Cancel
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-check me-1"></i>Create Organization
+                                <i class="fas fa-save me-1"></i>Save Changes
                             </button>
                         </div>
                     </form>
@@ -93,3 +101,4 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+

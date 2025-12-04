@@ -17,6 +17,7 @@ namespace EagleConnect.Services
 
     public interface IStudentOrganizationService
     {
+        // Organization CRUD
         Task<List<StudentOrganization>> GetAllOrganizationsAsync();
         Task<StudentOrganization?> GetOrganizationByIdAsync(int id);
         Task<List<StudentOrganization>> GetOrganizationsByCategoryAsync(string category);
@@ -24,9 +25,35 @@ namespace EagleConnect.Services
         Task<StudentOrganization> CreateOrganizationAsync(StudentOrganization organization);
         Task<StudentOrganization> UpdateOrganizationAsync(StudentOrganization organization);
         Task<bool> DeleteOrganizationAsync(int id);
+        
+        // Member management
         Task<bool> AddMemberToOrganizationAsync(int organizationId, string userId, string role = "Member");
         Task<bool> RemoveMemberFromOrganizationAsync(int organizationId, string userId);
         Task<List<ApplicationUser>> GetOrganizationMembersAsync(int organizationId);
+        Task<bool> IsMemberAsync(int organizationId, string userId);
+        Task<bool> IsModeratorAsync(int organizationId, string userId);
+        Task<StudentOrganizationMember?> GetMembershipAsync(int organizationId, string userId);
+        Task<List<StudentOrganization>> GetUserOrganizationsAsync(string userId);
+        
+        // Membership requests
+        Task<OrganizationMembershipRequest> CreateMembershipRequestAsync(int organizationId, string userId, string message = "");
+        Task<List<OrganizationMembershipRequest>> GetPendingRequestsAsync(int organizationId);
+        Task<OrganizationMembershipRequest?> GetUserPendingRequestAsync(int organizationId, string userId);
+        Task<bool> ApproveMembershipRequestAsync(int requestId, string moderatorId);
+        Task<bool> RejectMembershipRequestAsync(int requestId, string moderatorId, string? reason = null);
+        Task<bool> HasPendingRequestAsync(int organizationId, string userId);
+        
+        // Posts
+        Task<OrganizationPost> CreatePostAsync(OrganizationPost post);
+        Task<OrganizationPost?> GetPostByIdAsync(int postId);
+        Task<List<OrganizationPost>> GetOrganizationPostsAsync(int organizationId);
+        Task<OrganizationPost> UpdatePostAsync(OrganizationPost post);
+        Task<bool> DeletePostAsync(int postId);
+        Task<bool> TogglePinPostAsync(int postId);
+        
+        // Messages (Group Chat)
+        Task<OrganizationMessage> SendMessageAsync(int organizationId, string senderId, string content);
+        Task<List<OrganizationMessage>> GetMessagesAsync(int organizationId, int? skip = null, int? take = null);
     }
 
     public interface IRelationshipService
@@ -172,11 +199,13 @@ namespace EagleConnect.Services
             _context = context;
         }
 
+        // Organization CRUD
         public async Task<List<StudentOrganization>> GetAllOrganizationsAsync()
         {
             return await _context.StudentOrganizations
                 .Include(o => o.Members)
                 .ThenInclude(m => m.User)
+                .Include(o => o.Moderator)
                 .OrderBy(o => o.Name)
                 .ToListAsync();
         }
@@ -186,6 +215,9 @@ namespace EagleConnect.Services
             return await _context.StudentOrganizations
                 .Include(o => o.Members)
                 .ThenInclude(m => m.User)
+                .Include(o => o.Moderator)
+                .Include(o => o.MembershipRequests.Where(r => r.Status == MembershipRequestStatus.Pending))
+                .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
@@ -194,6 +226,7 @@ namespace EagleConnect.Services
             return await _context.StudentOrganizations
                 .Include(o => o.Members)
                 .ThenInclude(m => m.User)
+                .Include(o => o.Moderator)
                 .Where(o => o.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
                 .OrderBy(o => o.Name)
                 .ToListAsync();
@@ -204,6 +237,7 @@ namespace EagleConnect.Services
             return await _context.StudentOrganizations
                 .Include(o => o.Members)
                 .ThenInclude(m => m.User)
+                .Include(o => o.Moderator)
                 .Where(o => o.IsActive)
                 .OrderBy(o => o.Name)
                 .ToListAsync();
@@ -233,6 +267,7 @@ namespace EagleConnect.Services
             return true;
         }
 
+        // Member management
         public async Task<bool> AddMemberToOrganizationAsync(int organizationId, string userId, string role = "Member")
         {
             var existingMember = await _context.StudentOrganizationMembers
@@ -267,7 +302,7 @@ namespace EagleConnect.Services
 
             if (member == null) return false;
 
-            member.IsActive = false;
+            _context.StudentOrganizationMembers.Remove(member);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -279,6 +314,202 @@ namespace EagleConnect.Services
                 .Include(m => m.User)
                 .Select(m => m.User!)
                 .ToListAsync();
+        }
+
+        public async Task<bool> IsMemberAsync(int organizationId, string userId)
+        {
+            return await _context.StudentOrganizationMembers
+                .AnyAsync(m => m.OrganizationId == organizationId && m.UserId == userId && m.IsActive);
+        }
+
+        public async Task<bool> IsModeratorAsync(int organizationId, string userId)
+        {
+            var org = await _context.StudentOrganizations.FindAsync(organizationId);
+            return org?.ModeratorId == userId;
+        }
+
+        public async Task<StudentOrganizationMember?> GetMembershipAsync(int organizationId, string userId)
+        {
+            return await _context.StudentOrganizationMembers
+                .Include(m => m.User)
+                .Include(m => m.Organization)
+                .FirstOrDefaultAsync(m => m.OrganizationId == organizationId && m.UserId == userId);
+        }
+
+        public async Task<List<StudentOrganization>> GetUserOrganizationsAsync(string userId)
+        {
+            return await _context.StudentOrganizationMembers
+                .Where(m => m.UserId == userId && m.IsActive)
+                .Include(m => m.Organization)
+                .ThenInclude(o => o!.Moderator)
+                .Select(m => m.Organization!)
+                .OrderBy(o => o.Name)
+                .ToListAsync();
+        }
+
+        // Membership requests
+        public async Task<OrganizationMembershipRequest> CreateMembershipRequestAsync(int organizationId, string userId, string message = "")
+        {
+            var request = new OrganizationMembershipRequest
+            {
+                OrganizationId = organizationId,
+                UserId = userId,
+                Message = message,
+                Status = MembershipRequestStatus.Pending,
+                RequestedAt = DateTime.UtcNow
+            };
+
+            _context.OrganizationMembershipRequests.Add(request);
+            await _context.SaveChangesAsync();
+            return request;
+        }
+
+        public async Task<List<OrganizationMembershipRequest>> GetPendingRequestsAsync(int organizationId)
+        {
+            return await _context.OrganizationMembershipRequests
+                .Include(r => r.User)
+                .Where(r => r.OrganizationId == organizationId && r.Status == MembershipRequestStatus.Pending)
+                .OrderBy(r => r.RequestedAt)
+                .ToListAsync();
+        }
+
+        public async Task<OrganizationMembershipRequest?> GetUserPendingRequestAsync(int organizationId, string userId)
+        {
+            return await _context.OrganizationMembershipRequests
+                .FirstOrDefaultAsync(r => r.OrganizationId == organizationId && r.UserId == userId && r.Status == MembershipRequestStatus.Pending);
+        }
+
+        public async Task<bool> ApproveMembershipRequestAsync(int requestId, string moderatorId)
+        {
+            var request = await _context.OrganizationMembershipRequests.FindAsync(requestId);
+            if (request == null || request.Status != MembershipRequestStatus.Pending) return false;
+
+            request.Status = MembershipRequestStatus.Approved;
+            request.ProcessedAt = DateTime.UtcNow;
+            request.ProcessedById = moderatorId;
+
+            // Add user to organization members
+            await AddMemberToOrganizationAsync(request.OrganizationId, request.UserId, "Member");
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RejectMembershipRequestAsync(int requestId, string moderatorId, string? reason = null)
+        {
+            var request = await _context.OrganizationMembershipRequests.FindAsync(requestId);
+            if (request == null || request.Status != MembershipRequestStatus.Pending) return false;
+
+            request.Status = MembershipRequestStatus.Rejected;
+            request.ProcessedAt = DateTime.UtcNow;
+            request.ProcessedById = moderatorId;
+            request.RejectionReason = reason;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> HasPendingRequestAsync(int organizationId, string userId)
+        {
+            return await _context.OrganizationMembershipRequests
+                .AnyAsync(r => r.OrganizationId == organizationId && r.UserId == userId && r.Status == MembershipRequestStatus.Pending);
+        }
+
+        // Posts
+        public async Task<OrganizationPost> CreatePostAsync(OrganizationPost post)
+        {
+            post.CreatedAt = DateTime.UtcNow;
+            _context.OrganizationPosts.Add(post);
+            await _context.SaveChangesAsync();
+            return post;
+        }
+
+        public async Task<OrganizationPost?> GetPostByIdAsync(int postId)
+        {
+            return await _context.OrganizationPosts
+                .Include(p => p.Author)
+                .Include(p => p.Organization)
+                .FirstOrDefaultAsync(p => p.Id == postId);
+        }
+
+        public async Task<List<OrganizationPost>> GetOrganizationPostsAsync(int organizationId)
+        {
+            return await _context.OrganizationPosts
+                .Include(p => p.Author)
+                .Where(p => p.OrganizationId == organizationId && p.IsActive)
+                .OrderByDescending(p => p.IsPinned)
+                .ThenByDescending(p => p.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<OrganizationPost> UpdatePostAsync(OrganizationPost post)
+        {
+            post.UpdatedAt = DateTime.UtcNow;
+            _context.OrganizationPosts.Update(post);
+            await _context.SaveChangesAsync();
+            return post;
+        }
+
+        public async Task<bool> DeletePostAsync(int postId)
+        {
+            var post = await _context.OrganizationPosts.FindAsync(postId);
+            if (post == null) return false;
+
+            post.IsActive = false;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> TogglePinPostAsync(int postId)
+        {
+            var post = await _context.OrganizationPosts.FindAsync(postId);
+            if (post == null) return false;
+
+            post.IsPinned = !post.IsPinned;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // Messages (Group Chat)
+        public async Task<OrganizationMessage> SendMessageAsync(int organizationId, string senderId, string content)
+        {
+            var message = new OrganizationMessage
+            {
+                OrganizationId = organizationId,
+                SenderId = senderId,
+                Content = content,
+                SentAt = DateTime.UtcNow
+            };
+
+            _context.OrganizationMessages.Add(message);
+            await _context.SaveChangesAsync();
+
+            // Load sender for return
+            message.Sender = await _context.Users.FindAsync(senderId);
+            return message;
+        }
+
+        public async Task<List<OrganizationMessage>> GetMessagesAsync(int organizationId, int? skip = null, int? take = null)
+        {
+            var query = _context.OrganizationMessages
+                .Include(m => m.Sender)
+                .Where(m => m.OrganizationId == organizationId)
+                .OrderByDescending(m => m.SentAt);
+
+            IQueryable<OrganizationMessage> finalQuery = query;
+            
+            if (skip.HasValue)
+            {
+                finalQuery = finalQuery.Skip(skip.Value);
+            }
+
+            if (take.HasValue)
+            {
+                finalQuery = finalQuery.Take(take.Value);
+            }
+
+            var messages = await finalQuery.ToListAsync();
+            return messages.OrderBy(m => m.SentAt).ToList();
         }
     }
 

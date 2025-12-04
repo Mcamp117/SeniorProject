@@ -4,110 +4,341 @@
     ViewData["Title"] = "Student Organizations";
 }
 
-<div class="container">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="display-5 fw-bold text-primary">Student Organizations</h1>
-            <p class="lead">Discover and join student organizations that match your interests, career goals, and academic pursuits.</p>
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #002856 0%, #001a3d 100%);
+        border-radius: 20px;
+        padding: 3rem;
+        margin-bottom: 2rem;
+    }
+    .stat-card {
+        border-radius: 16px;
+        border: none;
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-4px);
+    }
+    .org-card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .org-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .org-card.my-org {
+        border: 2px solid #002856;
+    }
+    .org-card.moderator {
+        border: 2px solid #FCB643;
+    }
+    .category-badge {
+        background: linear-gradient(135deg, #002856 0%, #004080 100%);
+        color: white;
+        font-weight: 500;
+    }
+    .benefit-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(252, 182, 67, 0.15);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    .section-title {
+        position: relative;
+        display: inline-block;
+        padding-bottom: 0.5rem;
+    }
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, #002856, #FCB643);
+        border-radius: 2px;
+    }
+</style>
+
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="page-header text-white mb-5">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-3">Student Organizations</h1>
+                <p class="lead mb-0 text-white-50">Discover and join organizations that match your interests, career goals, and academic pursuits.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                <div class="d-inline-flex align-items-center bg-white bg-opacity-10 rounded-pill px-4 py-2">
+                    <i class="fas fa-search me-2 text-white-50"></i>
+                    <span class="text-white">@Model.Organizations.Count organizations available</span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="row mb-4">
+    <!-- Stats Row -->
+    <div class="row g-4 mb-5">
         <div class="col-md-4">
-            <div class="card bg-primary text-white">
-                <div class="card-body text-center">
-                    <h3>@Model.Organizations.Count</h3>
-                    <p class="mb-0">Organizations</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                    <h3>@Model.Organizations.SelectMany(o => o.Members.Where(m => m.IsActive).Select(m => m.UserId)).Distinct().Count()</h3>
-                    <p class="mb-0">Active Members</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-info text-white">
-                <div class="card-body text-center">
-                    <h3>@Model.Organizations.Select(o => o.Category).Distinct().Count()</h3>
-                    <p class="mb-0">Categories</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        @foreach (var org in Model.Organizations)
-        {
-            <div class="col-lg-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">@org.Name</h5>
-                        <p class="card-text">
-                            <span class="badge bg-primary">@org.Category</span>
-                            <span class="badge bg-secondary">@org.Members.Count(m => m.IsActive) members</span>
-                        </p>
-                        <p class="card-text">@org.Description</p>
-                        
-                        <div class="row mb-2">
-                            <div class="col-6">
-                                <small><strong>Meeting Time:</strong> @org.MeetingSchedule</small>
-                            </div>
-                            <div class="col-6">
-                                <small><strong>Location:</strong> @org.Location</small>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-2">
-                            <small><strong>Contact:</strong> <a href="mailto:@org.ContactEmail">@org.ContactEmail</a></small>
-                        </div>
-                        
-                        @if (!string.IsNullOrEmpty(org.Website))
-                        {
-                            <div class="mb-2">
-                                <small><strong>Website:</strong> <a href="@org.Website" target="_blank">@org.Website</a></small>
-                            </div>
-                        }
-                        
-                        <div class="mb-2">
-                            <small><strong>Founded:</strong> @org.CreatedDate.ToString("MMM yyyy")</small>
-                        </div>
-                        
-                        <button class="btn btn-primary btn-sm" disabled>Join Organization (Demo)</button>
-                        <span class="badge bg-success ms-2">Active</span>
+            <div class="card stat-card bg-primary text-white h-100">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="rounded-circle bg-white bg-opacity-25 p-3 me-3">
+                        <i class="fas fa-building fa-lg"></i>
                     </div>
+                    <div>
+                        <h3 class="mb-0 fw-bold">@Model.Organizations.Count</h3>
+                        <small class="text-white-50">Active Organizations</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card bg-success text-white h-100">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="rounded-circle bg-white bg-opacity-25 p-3 me-3">
+                        <i class="fas fa-users fa-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="mb-0 fw-bold">@Model.Organizations.SelectMany(o => o.Members.Where(m => m.IsActive).Select(m => m.UserId)).Distinct().Count()</h3>
+                        <small class="text-white-50">Total Members</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card text-white h-100" style="background: linear-gradient(135deg, #FCB643 0%, #e09a1f 100%);">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="rounded-circle bg-white bg-opacity-25 p-3 me-3">
+                        <i class="fas fa-star fa-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="mb-0 fw-bold">@Model.MyOrganizations.Count</h3>
+                        <small class="text-dark text-opacity-75">My Organizations</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.MyOrganizations.Any())
+    {
+        <!-- My Organizations Section -->
+        <div class="mb-5">
+            <h4 class="section-title fw-bold mb-4">
+                <i class="fas fa-star text-warning me-2"></i>My Organizations
+            </h4>
+            <div class="row g-4">
+                @foreach (var org in Model.MyOrganizations)
+                {
+                    var isModerator = org.ModeratorId == Model.CurrentUser.Id;
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card org-card h-100 @(isModerator ? "moderator" : "my-org")">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    @if (isModerator)
+                                    {
+                                        <span class="badge bg-warning text-dark"><i class="fas fa-shield-alt me-1"></i>Moderator</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Member</span>
+                                    }
+                                </div>
+                                <h5 class="fw-bold mb-2">@org.Name</h5>
+                                <p class="text-muted small mb-3" style="min-height: 40px;">
+                                    @(org.Description.Length > 80 ? org.Description.Substring(0, 80) + "..." : org.Description)
+                                </p>
+                                <div class="d-flex gap-2">
+                                    <a asp-page="/Organizations/View" asp-route-id="@org.Id" class="btn btn-primary flex-grow-1">
+                                        <i class="fas fa-door-open me-1"></i>Enter
+                                    </a>
+                                    @if (isModerator)
+                                    {
+                                        <a asp-page="/Organizations/Manage" asp-route-id="@org.Id" class="btn btn-warning">
+                                            <i class="fas fa-cog"></i>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <hr class="my-5">
+    }
+
+    <!-- All Organizations Section -->
+    <div class="mb-5">
+        <h4 class="section-title fw-bold mb-4">
+            <i class="fas fa-building text-primary me-2"></i>All Organizations
+        </h4>
+        
+        @if (Model.Organizations.Any())
+        {
+            <div class="row g-4">
+                @foreach (var org in Model.Organizations)
+                {
+                    var isMember = Model.IsMemberOf.GetValueOrDefault(org.Id, false);
+                    var hasPending = Model.HasPendingRequest.GetValueOrDefault(org.Id, false);
+                    var isModerator = org.ModeratorId == Model.CurrentUser.Id;
+                    
+                    <div class="col-lg-6">
+                        <div class="card org-card h-100">
+                            <div class="card-body p-4">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3" style="width: 56px; height: 56px; flex-shrink: 0;">
+                                                <i class="fas fa-users fa-lg"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="fw-bold mb-1">@org.Name</h5>
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    <span class="badge category-badge">@org.Category</span>
+                                                    <span class="badge bg-light text-dark">
+                                                        <i class="fas fa-users me-1"></i>@org.Members.Count(m => m.IsActive)
+                                                    </span>
+                                                    @if (isModerator)
+                                                    {
+                                                        <span class="badge bg-warning text-dark"><i class="fas fa-shield-alt me-1"></i>Moderator</span>
+                                                    }
+                                                    else if (isMember)
+                                                    {
+                                                        <span class="badge bg-success"><i class="fas fa-check me-1"></i>Member</span>
+                                                    }
+                                                    else if (hasPending)
+                                                    {
+                                                        <span class="badge bg-secondary"><i class="fas fa-clock me-1"></i>Pending</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <p class="text-muted mb-3">@org.Description</p>
+                                        
+                                        <div class="d-flex flex-wrap gap-3 text-muted small">
+                                            @if (!string.IsNullOrEmpty(org.MeetingSchedule))
+                                            {
+                                                <span><i class="fas fa-clock me-1"></i>@org.MeetingSchedule</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(org.Location))
+                                            {
+                                                <span><i class="fas fa-map-marker-alt me-1"></i>@org.Location</span>
+                                            }
+                                        </div>
+                                        
+                                        @if (org.Moderator != null)
+                                        {
+                                            <div class="mt-3 pt-3 border-top">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user-shield me-1"></i>Moderator: 
+                                                    <strong>@org.Moderator.FirstName @org.Moderator.LastName</strong>
+                                                </small>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="col-md-4 d-flex flex-column justify-content-end mt-3 mt-md-0">
+                                        @if (isMember || isModerator)
+                                        {
+                                            <a asp-page="/Organizations/View" asp-route-id="@org.Id" class="btn btn-primary mb-2">
+                                                <i class="fas fa-door-open me-1"></i>View
+                                            </a>
+                                            @if (isModerator)
+                                            {
+                                                <a asp-page="/Organizations/Manage" asp-route-id="@org.Id" class="btn btn-outline-warning">
+                                                    <i class="fas fa-cog me-1"></i>Manage
+                                                </a>
+                                            }
+                                        }
+                                        else if (hasPending)
+                                        {
+                                            <button class="btn btn-secondary mb-2" disabled>
+                                                <i class="fas fa-hourglass-half me-1"></i>Pending
+                                            </button>
+                                            <a asp-page="/Organizations/View" asp-route-id="@org.Id" class="btn btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i>Details
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-page="/Organizations/View" asp-route-id="@org.Id" class="btn btn-primary">
+                                                <i class="fas fa-user-plus me-1"></i>Join
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="card org-card">
+                <div class="card-body text-center py-5">
+                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-building fa-2x text-muted"></i>
+                    </div>
+                    <h5 class="text-muted">No Organizations Available</h5>
+                    <p class="text-muted mb-0">Check back later for new organizations.</p>
                 </div>
             </div>
         }
     </div>
 
-    <div class="row mt-5 mb-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Benefits of Joining Organizations</h5>
+    <!-- Benefits Section -->
+    <div class="card org-card mt-5" style="background: linear-gradient(135deg, #002856 0%, #001a3d 100%);">
+        <div class="card-body p-5">
+            <h4 class="text-white fw-bold text-center mb-5">Why Join an Organization?</h4>
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center">
+                        <div class="benefit-icon mx-auto">
+                            <i class="fas fa-users fa-lg" style="color: #FCB643;"></i>
+                        </div>
+                        <h6 class="text-white fw-bold">Networking</h6>
+                        <p class="text-white-50 small mb-0">Build meaningful connections with peers who share your interests.</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h6><i class="fas fa-users text-primary"></i> Networking</h6>
-                            <p class="small">Build relationships with peers who share your interests and career goals.</p>
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center">
+                        <div class="benefit-icon mx-auto">
+                            <i class="fas fa-trophy fa-lg" style="color: #FCB643;"></i>
                         </div>
-                        <div class="col-md-3">
-                            <h6><i class="fas fa-trophy text-success"></i> Leadership</h6>
-                            <p class="small">Develop leadership skills through officer positions and event planning.</p>
+                        <h6 class="text-white fw-bold">Leadership</h6>
+                        <p class="text-white-50 small mb-0">Develop leadership skills through active participation.</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center">
+                        <div class="benefit-icon mx-auto">
+                            <i class="fas fa-comments fa-lg" style="color: #FCB643;"></i>
                         </div>
-                        <div class="col-md-3">
-                            <h6><i class="fas fa-graduation-cap text-info"></i> Academic Support</h6>
-                            <p class="small">Get academic support and study resources from organization members.</p>
+                        <h6 class="text-white fw-bold">Group Chat</h6>
+                        <p class="text-white-50 small mb-0">Real-time communication with all organization members.</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center">
+                        <div class="benefit-icon mx-auto">
+                            <i class="fas fa-bullhorn fa-lg" style="color: #FCB643;"></i>
                         </div>
-                        <div class="col-md-3">
-                            <h6><i class="fas fa-briefcase text-warning"></i> Career Development</h6>
-                            <p class="small">Access career opportunities, internships, and professional development.</p>
-                        </div>
+                        <h6 class="text-white fw-bold">Stay Updated</h6>
+                        <p class="text-white-50 small mb-0">Get exclusive announcements and updates from moderators.</p>
                     </div>
                 </div>
             </div>

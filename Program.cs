@@ -59,6 +59,7 @@ builder.Services.AddScoped<IConnectionPostService, ConnectionPostService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IJobOfferService, JobOfferService>();
 
 // Add authentication services
 builder.Services.AddAuthentication()

@@ -7,8 +7,18 @@
 <div class="container">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="display-5 fw-bold text-primary">Employers & Career Opportunities</h1>
-            <p class="lead">Connect with potential employers and explore career opportunities with companies that value USI talent.</p>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1 class="display-5 fw-bold text-primary">Employers & Career Opportunities</h1>
+                    <p class="lead mb-0">Connect with potential employers and explore career opportunities with companies that value USI talent.</p>
+                </div>
+                @if (Model.IsExternalUser)
+                {
+                    <a asp-page="/External/CreateJobOffer" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus-circle me-2"></i>Post a Job Offer
+                    </a>
+                }
+            </div>
         </div>
     </div>
 
@@ -32,106 +42,280 @@
         <div class="col-md-4">
             <div class="card bg-info text-white">
                 <div class="card-body text-center">
-                    <h3>5+</h3>
+                    <h3>@Model.JobOffers.Count</h3>
                     <p class="mb-0">Open Positions</p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Job Offers Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <h3>Partner Companies</h3>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3><i class="fas fa-briefcase me-2 text-primary"></i>Available Job Opportunities</h3>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.JobOffers.Any())
+    {
+        <div class="row mb-5">
+            @foreach (var job in Model.JobOffers)
+            {
+                var daysLeft = (job.ApplicationDeadline - DateTime.UtcNow).Days;
+                var deadlineClass = daysLeft <= 7 ? "text-danger" : (daysLeft <= 14 ? "text-warning" : "text-success");
+                var posterConnection = Model.CurrentUser != null && job.PosterId != Model.CurrentUser.Id 
+                    ? Model.ConnectionStatuses.GetValueOrDefault(job.PosterId) 
+                    : null;
+                
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="card-title mb-1 fw-bold text-dark">@job.Title</h5>
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-building me-1"></i>
+                                        @(job.CompanyName ?? job.Poster?.Company ?? "Company")
+                                        @if (!string.IsNullOrEmpty(job.Location))
+                                        {
+                                            <span class="ms-2">
+                                                <i class="fas fa-map-marker-alt me-1"></i>@job.Location
+                                            </span>
+                                        }
+                                    </p>
+                                </div>
+                                <span class="badge @deadlineClass bg-opacity-10 @deadlineClass.Replace("text-", "bg-") text-white">
+                                    @if (daysLeft <= 0)
+                                    {
+                                        <span>Closing today!</span>
+                                    }
+                                    else if (daysLeft == 1)
+                                    {
+                                        <span>1 day left</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@daysLeft days left</span>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="text-primary fw-semibold mb-2">
+                                    <i class="fas fa-file-alt me-1"></i> Description
+                                </h6>
+                                <p class="card-text text-muted small" style="max-height: 80px; overflow: hidden;">
+                                    @job.Description
+                                </p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-primary fw-semibold mb-2">
+                                    <i class="fas fa-tasks me-1"></i> Responsibilities
+                                </h6>
+                                <p class="card-text text-muted small" style="max-height: 80px; overflow: hidden; white-space: pre-line;">@job.Responsibilities</p>
+                            </div>
+
+                            <div class="d-flex align-items-center text-muted small mb-3">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                <span>Apply by: <strong class="@deadlineClass">@job.ApplicationDeadline.ToString("MMMM d, yyyy")</strong></span>
+                            </div>
+
+                            @if (job.Poster != null)
+                            {
+                                <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                                        <i class="fas fa-user" style="font-size: 0.8rem;"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Posted by</small>
+                                        <strong class="small">@job.Poster.FirstName @job.Poster.LastName</strong>
+                                        @if (!string.IsNullOrEmpty(job.Poster.JobTitle))
+                                        {
+                                            <span class="text-muted small"> - @job.Poster.JobTitle</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-footer bg-white border-top pt-3 pb-3">
+                            <div class="d-flex gap-2">
+                                <a href="@job.Link" target="_blank" rel="noopener noreferrer" 
+                                   class="btn btn-primary flex-grow-1">
+                                    <i class="fas fa-paper-plane me-2"></i>Apply
+                                </a>
+                                @if (Model.CurrentUser != null && job.PosterId != Model.CurrentUser.Id)
+                                {
+                                    @if (posterConnection == EagleConnect.Models.ConnectionStatus.Accepted)
+                                    {
+                                        <a asp-page="/Connections" class="btn btn-success flex-grow-1">
+                                            <i class="fas fa-comments me-2"></i>Message
+                                        </a>
+                                    }
+                                    else if (posterConnection == EagleConnect.Models.ConnectionStatus.Pending)
+                                    {
+                                        <button type="button" class="btn btn-outline-secondary flex-grow-1" disabled>
+                                            <i class="fas fa-clock me-2"></i>Pending
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-page-handler="Connect" class="flex-grow-1">
+                                            <input type="hidden" name="userId" value="@job.PosterId" />
+                                            <button type="submit" class="btn btn-outline-primary w-100">
+                                                <i class="fas fa-user-plus me-2"></i>Connect
+                                            </button>
+                                        </form>
+                                    }
+                                }
+                                else if (Model.CurrentUser == null)
+                                {
+                                    <a asp-page="/Account/Login" class="btn btn-outline-primary flex-grow-1">
+                                        <i class="fas fa-user-plus me-2"></i>Connect
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Job Offers Available</h5>
+                        <p class="text-muted mb-0">Check back later for new opportunities.</p>
+                        @if (Model.IsExternalUser)
+                        {
+                            <a asp-page="/External/CreateJobOffer" class="btn btn-primary mt-3">
+                                <i class="fas fa-plus-circle me-2"></i>Post the First Job Offer
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Partner Companies Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3><i class="fas fa-handshake me-2 text-primary"></i>Partner Companies</h3>
         </div>
     </div>
 
     <div class="row mb-4">
-        @foreach (var company in Model.Companies)
+        @if (Model.Companies.Any())
         {
-            var companyEmployers = Model.Employers.Where(e => e.Company == company).ToList();
-            <div class="col-md-6 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">@company</h5>
+            @foreach (var company in Model.Companies)
+            {
+                var companyEmployers = Model.Employers.Where(e => e.Company == company).ToList();
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fas fa-building me-2 text-primary"></i>@company
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted mb-3">
+                                <i class="fas fa-users me-1"></i> @companyEmployers.Count contact(s) available
+                            </p>
+                            <ul class="list-unstyled mb-0">
+                                @foreach (var employer in companyEmployers)
+                                {
+                                    var connectionStatus = Model.CurrentUser != null && employer.Id != Model.CurrentUser.Id 
+                                        ? Model.ConnectionStatuses.GetValueOrDefault(employer.Id) 
+                                        : null;
+                                    
+                                    <li class="mb-3 pb-3 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <strong>@employer.FirstName @employer.LastName</strong><br>
+                                                <small class="text-muted">@employer.JobTitle</small>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <a href="mailto:@employer.Email" class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-envelope me-1"></i>Email
+                                                </a>
+                                                @if (Model.CurrentUser != null && employer.Id != Model.CurrentUser.Id)
+                                                {
+                                                    @if (connectionStatus == EagleConnect.Models.ConnectionStatus.Accepted)
+                                                    {
+                                                        <a asp-page="/Connections" class="btn btn-success btn-sm">
+                                                            <i class="fas fa-check me-1"></i>Connected
+                                                        </a>
+                                                    }
+                                                    else if (connectionStatus == EagleConnect.Models.ConnectionStatus.Pending)
+                                                    {
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                                                            <i class="fas fa-clock me-1"></i>Pending
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <form method="post" asp-page-handler="Connect" class="d-inline">
+                                                            <input type="hidden" name="userId" value="@employer.Id" />
+                                                            <button type="submit" class="btn btn-outline-primary btn-sm">
+                                                                <i class="fas fa-user-plus me-1"></i>Connect
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                }
+                                                else if (Model.CurrentUser == null)
+                                                {
+                                                    <a asp-page="/Account/Login" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-user-plus me-1"></i>Connect
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p class="card-text">@companyEmployers.Count contact(s) available</p>
-                        <ul class="list-unstyled">
-                            @foreach (var employer in companyEmployers)
-                            {
-                                <li class="mb-2">
-                                    <strong>@employer.FirstName @employer.LastName</strong><br>
-                                    <small class="text-muted">@employer.JobTitle</small><br>
-                                    <a href="mailto:@employer.Email" class="btn btn-outline-primary btn-sm mt-1">Contact</a>
-                                </li>
-                            }
-                        </ul>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-4">
+                        <i class="fas fa-building fa-2x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">No partner companies registered yet.</p>
                     </div>
                 </div>
             </div>
         }
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <h3>Available Opportunities</h3>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="border p-3 rounded">
-                                <h6>Software Development Internship</h6>
-                                <p class="small text-muted">TechCorp - Summer 2025</p>
-                                <p class="small">Join our development team and work on cutting-edge projects. Perfect for Computer Science students.</p>
-                                <span class="badge bg-primary">Internship</span>
-                                <span class="badge bg-secondary">Remote</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="border p-3 rounded">
-                                <h6>Marketing Assistant</h6>
-                                <p class="small text-muted">InnovateStart - Part-time</p>
-                                <p class="small">Help with digital marketing campaigns and social media management. Great for Business students.</p>
-                                <span class="badge bg-success">Part-time</span>
-                                <span class="badge bg-info">Marketing</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="border p-3 rounded">
-                                <h6>Research Assistant</h6>
-                                <p class="small text-muted">Various Companies - Flexible</p>
-                                <p class="small">Support research projects in various fields. Open to all majors with research interests.</p>
-                                <span class="badge bg-warning">Research</span>
-                                <span class="badge bg-secondary">Flexible</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="border p-3 rounded">
-                                <h6>Healthcare Volunteer</h6>
-                                <p class="small text-muted">Local Hospitals - Ongoing</p>
-                                <p class="small">Gain healthcare experience and make a difference in your community. Ideal for Nursing students.</p>
-                                <span class="badge bg-info">Volunteer</span>
-                                <span class="badge bg-success">Healthcare</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="row mt-4">
         <div class="col-12">
-            <div class="card bg-light">
-                <div class="card-body text-center">
-                    <h5>Ready to Connect?</h5>
-                    <p>Reach out to our employer contacts to learn more about opportunities and how to apply.</p>
-                    <a asp-page="/External/Index" class="btn btn-primary">View All Contacts</a>
+            <div class="card bg-light border-0 shadow-sm">
+                <div class="card-body text-center py-4">
+                    <h5 class="mb-2"><i class="fas fa-question-circle me-2 text-primary"></i>Ready to Connect?</h5>
+                    <p class="text-muted mb-3">Reach out to our employer contacts to learn more about opportunities and how to apply.</p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a asp-page="/External/Index" class="btn btn-primary">
+                            <i class="fas fa-user-tie me-2"></i>View All Mentors
+                        </a>
+                        @if (Model.IsExternalUser)
+                        {
+                            <a asp-page="/External/CreateJobOffer" class="btn btn-outline-primary">
+                                <i class="fas fa-plus-circle me-2"></i>Post a Job Offer
+                            </a>
+                        }
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,0 +1,78 @@
+@page "{id:int}"
+@model EagleConnect.Pages.Organizations.CreatePostModel
+@{
+    ViewData["Title"] = "Create Post - " + Model.Organization.Name;
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-page="/Organizations">Organizations</a></li>
+                    <li class="breadcrumb-item"><a asp-page="/Organizations/View" asp-route-id="@Model.Organization.Id">@Model.Organization.Name</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Create Post</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header" style="background: linear-gradient(135deg, #002856 0%, #001a3d 100%);">
+                    <h4 class="text-white mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Create New Post
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        <div class="mb-4">
+                            <label asp-for="Input.Title" class="form-label fw-semibold">
+                                <i class="fas fa-heading me-1 text-primary"></i> Title *
+                            </label>
+                            <input asp-for="Input.Title" class="form-control" placeholder="Enter post title..." />
+                            <span asp-validation-for="Input.Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Input.Content" class="form-label fw-semibold">
+                                <i class="fas fa-file-alt me-1 text-primary"></i> Content *
+                            </label>
+                            <textarea asp-for="Input.Content" class="form-control" rows="10" 
+                                placeholder="Write your post content here..."></textarea>
+                            <span asp-validation-for="Input.Content" class="text-danger small"></span>
+                            <small class="text-muted">You can use line breaks to format your content.</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input asp-for="Input.IsPinned" class="form-check-input" type="checkbox" />
+                                <label asp-for="Input.IsPinned" class="form-check-label">
+                                    <i class="fas fa-thumbtack me-1 text-warning"></i> Pin this post
+                                </label>
+                            </div>
+                            <small class="text-muted">Pinned posts appear at the top of the organization page.</small>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Publish Post
+                            </button>
+                            <a asp-page="/Organizations/View" asp-route-id="@Model.Organization.Id" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

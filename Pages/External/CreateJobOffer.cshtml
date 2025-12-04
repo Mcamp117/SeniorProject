@@ -1,0 +1,127 @@
+@page
+@model EagleConnect.Pages.External.CreateJobOfferModel
+@{
+    ViewData["Title"] = "Post a Job Offer";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header" style="background: linear-gradient(135deg, #002856 0%, #001a3d 100%);">
+                    <h3 class="text-white mb-0">
+                        <i class="fas fa-briefcase me-2"></i>Post a Job Offer
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>@Model.ErrorMessage
+                        </div>
+                    }
+                    else if (Model.CurrentUser?.Type != EagleConnect.Models.UserType.External)
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Only external employers can create job offers. Please contact an administrator if you believe this is an error.
+                        </div>
+                        <a asp-page="/External/Employers" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Employers
+                        </a>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-4">
+                            Create a job opportunity for USI students and alumni. Fill in the details below to post your job offer.
+                        </p>
+                        
+                        <form method="post">
+                            <div class="mb-4">
+                                <label asp-for="Input.Title" class="form-label fw-semibold">
+                                    <i class="fas fa-heading me-1 text-primary"></i> Job Title *
+                                </label>
+                                <input asp-for="Input.Title" class="form-control" placeholder="e.g., Software Engineer Intern" />
+                                <span asp-validation-for="Input.Title" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Input.Description" class="form-label fw-semibold">
+                                    <i class="fas fa-file-alt me-1 text-primary"></i> Job Description *
+                                </label>
+                                <textarea asp-for="Input.Description" class="form-control" rows="5" 
+                                    placeholder="Describe the job position, what the role involves, required skills, and any other relevant information..."></textarea>
+                                <span asp-validation-for="Input.Description" class="text-danger small"></span>
+                                <small class="text-muted">Describe the position, required skills, and any other relevant information.</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Input.Responsibilities" class="form-label fw-semibold">
+                                    <i class="fas fa-tasks me-1 text-primary"></i> Responsibilities *
+                                </label>
+                                <textarea asp-for="Input.Responsibilities" class="form-control" rows="5" 
+                                    placeholder="• Develop and maintain software applications&#10;• Collaborate with team members&#10;• Participate in code reviews&#10;• Document technical solutions"></textarea>
+                                <span asp-validation-for="Input.Responsibilities" class="text-danger small"></span>
+                                <small class="text-muted">List the key responsibilities for this position. Use bullet points (•) for clarity.</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label asp-for="Input.ApplicationDeadline" class="form-label fw-semibold">
+                                        <i class="fas fa-calendar-alt me-1 text-primary"></i> Application Deadline *
+                                    </label>
+                                    <input asp-for="Input.ApplicationDeadline" type="date" class="form-control" />
+                                    <span asp-validation-for="Input.ApplicationDeadline" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <label asp-for="Input.Location" class="form-label fw-semibold">
+                                        <i class="fas fa-map-marker-alt me-1 text-primary"></i> Location
+                                    </label>
+                                    <input asp-for="Input.Location" class="form-control" placeholder="e.g., Remote, Evansville, IN" />
+                                    <span asp-validation-for="Input.Location" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Input.Link" class="form-label fw-semibold">
+                                    <i class="fas fa-link me-1 text-primary"></i> Application Link *
+                                </label>
+                                <input asp-for="Input.Link" class="form-control" type="url" 
+                                    placeholder="https://yourcompany.com/careers/apply" />
+                                <span asp-validation-for="Input.Link" class="text-danger small"></span>
+                                <small class="text-muted">Direct link where candidates can apply for this position.</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Input.CompanyName" class="form-label fw-semibold">
+                                    <i class="fas fa-building me-1 text-primary"></i> Company Name
+                                </label>
+                                <input asp-for="Input.CompanyName" class="form-control" 
+                                    placeholder="Leave blank to use your profile company" />
+                                <span asp-validation-for="Input.CompanyName" class="text-danger small"></span>
+                                <small class="text-muted">Optional - defaults to your profile company: @(Model.CurrentUser?.Company ?? "Not set")</small>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="d-flex gap-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-paper-plane me-2"></i>Post Job Offer
+                                </button>
+                                <a asp-page="/External/Employers" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
